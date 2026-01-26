@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Cost Per Mile Calculator | Owner Operator | BalanceBooks</title>
+    <meta name="description" content="Free cost per mile calculator for truckers. Track all your operating expenses and know your true cost to run your truck. Essential for setting profitable rates.">
+    <meta name="keywords" content="cost per mile calculator, trucking expenses, owner operator costs, operating cost, trucking calculator">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/cost-per-mile">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --teal-500: #14b8a6;
+            --green-500: #22c55e;
+            --red-500: #ef4444;
+            --purple-500: #a855f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .hero {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--navy-300);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-body {
+            padding: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--navy-700);
+        }
+
+        .miles-input {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--navy-900);
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .miles-input label {
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .miles-input input {
+            width: 140px;
+            padding: 12px 16px;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            outline: none;
+        }
+
+        .miles-input input:focus {
+            border-color: var(--orange-500);
+        }
+
+        .miles-input .hint {
+            font-size: 13px;
+            color: var(--navy-400);
+        }
+
+        .expense-grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .expense-row {
+            display: grid;
+            grid-template-columns: 1fr 130px 100px;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--navy-900);
+            border-radius: 12px;
+            border: 1px solid var(--navy-700);
+        }
+
+        @media (max-width: 600px) {
+            .expense-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        .expense-row .label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--navy-200);
+        }
+
+        .expense-row .label .icon {
+            font-size: 18px;
+        }
+
+        .expense-row input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+            outline: none;
+        }
+
+        .expense-row input:focus {
+            border-color: var(--teal-500);
+        }
+
+        .expense-row .cpm {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--teal-500);
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .category-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--navy-700);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .category-total .label {
+            font-weight: 600;
+            color: white;
+        }
+
+        .category-total .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--navy-700);
+            margin: 32px 0;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+            border: 2px solid var(--orange-500);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .results-section h3 {
+            font-size: 16px;
+            color: var(--navy-300);
+            margin-bottom: 24px;
+        }
+
+        .big-number {
+            font-size: 56px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--orange-400);
+            margin-bottom: 8px;
+        }
+
+        .big-label {
+            font-size: 14px;
+            color: var(--navy-400);
+            margin-bottom: 32px;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .breakdown-grid { grid-template-columns: 1fr; }
+        }
+
+        .breakdown-card {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-700);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .breakdown-card .label {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-bottom: 4px;
+        }
+
+        .breakdown-card .value {
+            font-size: 22px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .breakdown-card .value.orange { color: var(--orange-400); }
+        .breakdown-card .value.teal { color: var(--teal-500); }
+        .breakdown-card .value.purple { color: var(--purple-500); }
+
+        .tip-box {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .tip-box h5 {
+            font-size: 14px;
+            color: var(--teal-500);
+            margin-bottom: 8px;
+        }
+
+        .tip-box p {
+            font-size: 13px;
+            color: var(--navy-300);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-400) 100%);
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">🛣️</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1><span>Cost Per Mile</span> Calculator</h1>
+                <p>Know your true operating cost. Enter your monthly expenses and miles to calculate your break-even rate per mile.</p>
+            </section>
+
+            <div class="app-container">
+                <div class="app-body">
+                    <!-- Miles Input -->
+                    <div class="miles-input">
+                        <label>🚛 Monthly Miles:</label>
+                        <input type="number" id="monthlyMiles" value="10000" oninput="calculate()">
+                        <span class="hint">Average miles you drive per month</span>
+                    </div>
+
+                    <!-- Fixed Costs -->
+                    <div class="section-title">📋 Fixed Costs (Monthly)</div>
+                    <div class="expense-grid" id="fixed-costs">
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🚛</span> Truck Payment</div>
+                            <input type="number" data-category="fixed" value="1800" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.18/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🛡️</span> Insurance</div>
+                            <input type="number" data-category="fixed" value="1200" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.12/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🏷️</span> Permits & Licenses</div>
+                            <input type="number" data-category="fixed" value="200" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.02/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">📱</span> ELD / Subscriptions</div>
+                            <input type="number" data-category="fixed" value="75" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.01/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🅿️</span> Parking / Tolls (avg)</div>
+                            <input type="number" data-category="fixed" value="300" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.03/mi</div>
+                        </div>
+                    </div>
+                    <div class="category-total">
+                        <span class="label">Fixed Costs Total</span>
+                        <span class="value" id="fixedTotal" style="color: var(--orange-400);">$3,575/mo = $0.36/mi</span>
+                    </div>
+
+                    <!-- Variable Costs -->
+                    <div class="section-title">⚙️ Variable Costs (Monthly Estimate)</div>
+                    <div class="expense-grid" id="variable-costs">
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">⛽</span> Fuel</div>
+                            <input type="number" data-category="variable" value="4500" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.45/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🔧</span> Maintenance / Repairs</div>
+                            <input type="number" data-category="variable" value="500" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.05/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🛞</span> Tires</div>
+                            <input type="number" data-category="variable" value="300" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.03/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">💧</span> DEF / Oil / Fluids</div>
+                            <input type="number" data-category="variable" value="150" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.02/mi</div>
+                        </div>
+                        <div class="expense-row">
+                            <div class="label"><span class="icon">🧹</span> Truck Wash / Misc</div>
+                            <input type="number" data-category="variable" value="100" oninput="calculate()">
+                            <div class="cpm" data-cpm>$0.01/mi</div>
+                        </div>
+                    </div>
+                    <div class="category-total">
+                        <span class="label">Variable Costs Total</span>
+                        <span class="value" id="variableTotal" style="color: var(--teal-500);">$5,550/mo = $0.56/mi</span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Results -->
+                    <div class="results-section">
+                        <h3>Your Operating Cost Per Mile</h3>
+                        <div class="big-number" id="totalCPM">$0.91</div>
+                        <div class="big-label">This is your break-even rate. You need to earn more than this to profit.</div>
+
+                        <div class="breakdown-grid">
+                            <div class="breakdown-card">
+                                <div class="label">Monthly Expenses</div>
+                                <div class="value orange" id="monthlyTotal">$9,125</div>
+                            </div>
+                            <div class="breakdown-card">
+                                <div class="label">Fixed CPM</div>
+                                <div class="value teal" id="fixedCPM">$0.36</div>
+                            </div>
+                            <div class="breakdown-card">
+                                <div class="label">Variable CPM</div>
+                                <div class="value purple" id="variableCPM">$0.56</div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <h5>💡 Minimum Rate Recommendation</h5>
+                            <p>To make a 20% profit margin, charge at least <strong id="recommendedRate">$1.14/mi</strong> all-in. For a 30% margin, charge <strong id="recommendedRate30">$1.30/mi</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        <a href="/load-calculator" class="btn btn-secondary">💰 Load Calculator</a>
+                        <button class="btn btn-primary" onclick="syncToBalanceBooks()">🔄 Sync to BalanceBooks</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="tools-nav">
+                <a href="/">🏠 All Tools</a>
+                <a href="/fuel-converter">⛽ Fuel Converter</a>
+                <a href="/ifta-calculator">📊 IFTA Calculator</a>
+                <a href="/load-calculator">💰 Load Calculator</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
+        </div>
+    </footer>
+
+    <script>
+        function calculate() {
+            const miles = parseFloat(document.getElementById('monthlyMiles').value) || 10000;
+
+            // Calculate fixed costs
+            const fixedInputs = document.querySelectorAll('[data-category="fixed"]');
+            let fixedTotal = 0;
+            fixedInputs.forEach((input, i) => {
+                const val = parseFloat(input.value) || 0;
+                fixedTotal += val;
+                const cpm = val / miles;
+                input.parentElement.querySelector('[data-cpm]').textContent = '$' + cpm.toFixed(2) + '/mi';
+            });
+
+            // Calculate variable costs
+            const variableInputs = document.querySelectorAll('[data-category="variable"]');
+            let variableTotal = 0;
+            variableInputs.forEach((input, i) => {
+                const val = parseFloat(input.value) || 0;
+                variableTotal += val;
+                const cpm = val / miles;
+                input.parentElement.querySelector('[data-cpm]').textContent = '$' + cpm.toFixed(2) + '/mi';
+            });
+
+            const totalMonthly = fixedTotal + variableTotal;
+            const fixedCPM = fixedTotal / miles;
+            const variableCPM = variableTotal / miles;
+            const totalCPM = totalMonthly / miles;
+
+            // Update displays
+            document.getElementById('fixedTotal').textContent = `$${fixedTotal.toLocaleString()}/mo = $${fixedCPM.toFixed(2)}/mi`;
+            document.getElementById('variableTotal').textContent = `$${variableTotal.toLocaleString()}/mo = $${variableCPM.toFixed(2)}/mi`;
+            document.getElementById('totalCPM').textContent = '$' + totalCPM.toFixed(2);
+            document.getElementById('monthlyTotal').textContent = '$' + totalMonthly.toLocaleString();
+            document.getElementById('fixedCPM').textContent = '$' + fixedCPM.toFixed(2);
+            document.getElementById('variableCPM').textContent = '$' + variableCPM.toFixed(2);
+
+            // Recommendations
+            const rate20 = totalCPM / 0.80;
+            const rate30 = totalCPM / 0.70;
+            document.getElementById('recommendedRate').textContent = '$' + rate20.toFixed(2) + '/mi';
+            document.getElementById('recommendedRate30').textContent = '$' + rate30.toFixed(2) + '/mi';
+        }
+
+        function resetForm() {
+            document.getElementById('monthlyMiles').value = 10000;
+            const defaults = [1800, 1200, 200, 75, 300, 4500, 500, 300, 150, 100];
+            const inputs = document.querySelectorAll('[data-category]');
+            inputs.forEach((input, i) => {
+                input.value = defaults[i] || 0;
+            });
+            calculate();
+        }
+
+        // ============ BALANCEBOOKS INTEGRATION ============
+        function syncToBalanceBooks() {
+            const miles = parseFloat(document.getElementById('monthlyMiles').value) || 10000;
+            
+            // Collect all expense data
+            const fixedCosts = {};
+            const fixedLabels = ['truckPayment', 'insurance', 'permits', 'eld', 'parking'];
+            document.querySelectorAll('[data-category="fixed"]').forEach((input, i) => {
+                fixedCosts[fixedLabels[i]] = parseFloat(input.value) || 0;
+            });
+
+            const variableCosts = {};
+            const varLabels = ['fuel', 'maintenance', 'tires', 'def', 'misc'];
+            document.querySelectorAll('[data-category="variable"]').forEach((input, i) => {
+                variableCosts[varLabels[i]] = parseFloat(input.value) || 0;
+            });
+
+            const fixedTotal = Object.values(fixedCosts).reduce((s, v) => s + v, 0);
+            const variableTotal = Object.values(variableCosts).reduce((s, v) => s + v, 0);
+            const totalCPM = (fixedTotal + variableTotal) / miles;
+
+            const payload = {
+                source: 'cost-per-mile',
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                settings: {
+                    monthlyMiles: miles,
+                    fixedCosts: fixedCosts,
+                    variableCosts: variableCosts,
+                    calculated: {
+                        fixedTotal: fixedTotal,
+                        variableTotal: variableTotal,
+                        totalMonthly: fixedTotal + variableTotal,
+                        totalCPM: totalCPM,
+                        fixedCPM: fixedTotal / miles,
+                        variableCPM: variableTotal / miles,
+                        breakEvenRate: totalCPM,
+                        recommendedRate20: totalCPM / 0.80,
+                        recommendedRate30: totalCPM / 0.70
+                    }
+                }
+            };
+
+            try {
+                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
+                
+                const msg = `Sync cost-per-mile settings to BalanceBooks?\n\n` +
+                    `• Total CPM: $${totalCPM.toFixed(2)}/mi\n` +
+                    `• Monthly Costs: $${(fixedTotal + variableTotal).toLocaleString()}\n` +
+                    `• Break-even Rate: $${totalCPM.toFixed(2)}/mi\n` +
+                    `• Recommended (20% profit): $${(totalCPM / 0.80).toFixed(2)}/mi\n\n` +
+                    `Click OK to open BalanceBooks Trucking.`;
+                
+                if (confirm(msg)) {
+                    window.open('https://trucking.balancebooksapp.com/settings?import=cpm', '_blank');
+                }
+            } catch (e) {
+                console.error('Integration error:', e);
+                alert('Could not sync settings. Please try again.');
+            }
+        }
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>

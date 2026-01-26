@@ -1,0 +1,108 @@
+{
+  "name": "BalanceBooks Trucking Tools",
+  "short_name": "BB Tools",
+  "description": "Free calculators and converters for truckers. IFTA calculator, fuel card converter, load profitability, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fuel Card Converter",
+      "short_name": "Fuel Converter",
+      "description": "Convert fuel card statements to spreadsheet",
+      "url": "/fuel-converter",
+      "icons": [{ "src": "/icons/fuel-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "IFTA Calculator",
+      "short_name": "IFTA",
+      "description": "Calculate quarterly fuel tax by state",
+      "url": "/ifta-calculator",
+      "icons": [{ "src": "/icons/ifta-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Load Calculator",
+      "short_name": "Load Profit",
+      "description": "Calculate load profitability",
+      "url": "/load-calculator",
+      "icons": [{ "src": "/icons/load-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshots/tools-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tools Home Page"
+    },
+    {
+      "src": "/screenshots/fuel-converter.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Fuel Card Converter"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://app.balancebooksapp.com"
+    }
+  ],
+  "prefer_related_applications": false
+}

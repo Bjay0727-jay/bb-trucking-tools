@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Load Profitability Calculator | Owner Operator | BalanceBooks</title>
+    <meta name="description" content="Free load profitability calculator for truckers. Calculate profit per mile, fuel costs, and whether a load is worth taking. Instant results.">
+    <meta name="keywords" content="load profitability calculator, trucker profit calculator, owner operator calculator, rate per mile, trucking profit">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/load-calculator">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --orange-600: #ea580c;
+            --teal-500: #14b8a6;
+            --green-500: #22c55e;
+            --green-400: #4ade80;
+            --red-500: #ef4444;
+            --yellow-500: #eab308;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(ellipse at 30% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(249, 115, 22, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--green-500) 0%, var(--green-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .logo-badge {
+            background: var(--navy-700);
+            color: var(--green-400);
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-link {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: var(--navy-300);
+        }
+
+        .header-link:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+
+        .header-link.primary {
+            color: var(--navy-900);
+            background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--green-400) 0%, var(--green-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--navy-300);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-body {
+            padding: 32px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group label .icon {
+            font-size: 16px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-400);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-wrapper .suffix {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-400);
+            font-size: 12px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--navy-900);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--green-500);
+        }
+
+        .form-group input.has-prefix {
+            padding-left: 32px;
+        }
+
+        .form-group input.has-suffix {
+            padding-right: 50px;
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--navy-700);
+            margin: 32px 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .result-card.highlight {
+            border-width: 2px;
+        }
+
+        .result-card.green {
+            border-color: var(--green-500);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .result-card.red {
+            border-color: var(--red-500);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .result-card.yellow {
+            border-color: var(--yellow-500);
+            background: rgba(234, 179, 8, 0.1);
+        }
+
+        .result-card .label {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-bottom: 8px;
+        }
+
+        .result-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-card .value.green { color: var(--green-400); }
+        .result-card .value.red { color: var(--red-500); }
+        .result-card .value.yellow { color: var(--yellow-500); }
+        .result-card .value.orange { color: var(--orange-400); }
+        .result-card .value.teal { color: var(--teal-500); }
+
+        .result-card .sub {
+            font-size: 11px;
+            color: var(--navy-400);
+            margin-top: 4px;
+        }
+
+        .verdict-box {
+            background: var(--navy-900);
+            border: 2px solid var(--navy-600);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .verdict-box.good {
+            border-color: var(--green-500);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--navy-900) 100%);
+        }
+
+        .verdict-box.bad {
+            border-color: var(--red-500);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--navy-900) 100%);
+        }
+
+        .verdict-box.marginal {
+            border-color: var(--yellow-500);
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, var(--navy-900) 100%);
+        }
+
+        .verdict-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .verdict-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .verdict-detail {
+            font-size: 14px;
+            color: var(--navy-300);
+        }
+
+        /* Breakdown */
+        .breakdown {
+            margin-top: 24px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--navy-700);
+            font-size: 14px;
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-row .label {
+            color: var(--navy-300);
+        }
+
+        .breakdown-row .value {
+            font-family: 'JetBrains Mono', monospace;
+            color: white;
+            font-weight: 500;
+        }
+
+        .breakdown-row .value.negative {
+            color: var(--red-500);
+        }
+
+        .breakdown-row.total {
+            border-top: 2px solid var(--navy-600);
+            margin-top: 8px;
+            padding-top: 16px;
+            font-weight: 700;
+        }
+
+        .breakdown-row.total .label {
+            color: white;
+            font-size: 16px;
+        }
+
+        .breakdown-row.total .value {
+            font-size: 18px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-600);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--green-500) 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+
+        @media (max-width: 768px) {
+            .app-body { padding: 20px; }
+            .header-links { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/fuel-converter" class="logo">
+                    <div class="logo-icon">💰</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                    <span class="logo-badge">Tools</span>
+                </a>
+                <div class="header-links">
+                    <a href="/fuel-converter" class="header-link">Fuel Converter</a>
+                    <a href="/ifta-calculator" class="header-link">IFTA Calculator</a>
+                    <a href="https://trucking.balancebooksapp.com" class="header-link primary">Get Full App →</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1>Load <span>Profitability</span> Calculator</h1>
+                <p>Know if a load is worth taking before you book it. Calculate true profit per mile including all costs.</p>
+            </section>
+
+            <div class="app-container">
+                <div class="app-body">
+                    <!-- Load Details -->
+                    <div class="section-title">📦 Load Details</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><span class="icon">💵</span> Line Haul Rate</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="lineHaul" class="has-prefix" value="2500" step="50" oninput="calculate()">
+                            </div>
+                            <span class="hint">Total rate for the load</span>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">🛣️</span> Loaded Miles</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="loadedMiles" class="has-suffix" value="800" oninput="calculate()">
+                                <span class="suffix">mi</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">🔄</span> Deadhead Miles</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="deadheadMiles" class="has-suffix" value="50" oninput="calculate()">
+                                <span class="suffix">mi</span>
+                            </div>
+                            <span class="hint">Empty miles to pickup</span>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">➕</span> Fuel Surcharge</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="fuelSurcharge" class="has-prefix" value="0" step="10" oninput="calculate()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Operating Costs -->
+                    <div class="section-title">⚙️ Your Operating Costs</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><span class="icon">⛽</span> Fuel Price</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="fuelPrice" class="has-prefix has-suffix" value="3.50" step="0.05" oninput="calculate()">
+                                <span class="suffix">/gal</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">🚛</span> Truck MPG</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="mpg" class="has-suffix" value="6.5" step="0.1" oninput="calculate()">
+                                <span class="suffix">mpg</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">💸</span> Cost Per Mile</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="costPerMile" class="has-prefix has-suffix" value="0.45" step="0.01" oninput="calculate()">
+                                <span class="suffix">/mi</span>
+                            </div>
+                            <span class="hint">Insurance, maintenance, etc. (excl. fuel)</span>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="icon">🏢</span> Dispatch/Broker Fee</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="dispatchFee" class="has-suffix" value="0" step="1" oninput="calculate()">
+                                <span class="suffix">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Results -->
+                    <div class="section-title">📊 Results</div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="label">Gross Revenue</div>
+                            <div class="value orange" id="grossRevenue">$2,500</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Total Miles</div>
+                            <div class="value teal" id="totalMiles">850</div>
+                            <div class="sub" id="milesBreakdown">800 loaded + 50 empty</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Fuel Cost</div>
+                            <div class="value red" id="fuelCost">$458</div>
+                            <div class="sub" id="fuelGallons">131 gallons</div>
+                        </div>
+                        <div class="result-card highlight" id="profitCard">
+                            <div class="label">Net Profit</div>
+                            <div class="value green" id="netProfit">$1,659</div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="label">Rate Per Mile (Gross)</div>
+                            <div class="value" id="rpmGross">$2.94</div>
+                            <div class="sub">Before expenses</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Rate Per Mile (Net)</div>
+                            <div class="value green" id="rpmNet">$1.95</div>
+                            <div class="sub">Your actual earnings</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Profit Margin</div>
+                            <div class="value" id="profitMargin">66%</div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown -->
+                    <div class="breakdown">
+                        <div class="breakdown-row">
+                            <span class="label">Line Haul</span>
+                            <span class="value" id="bLineHaul">$2,500.00</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="label">Fuel Surcharge</span>
+                            <span class="value" id="bFuelSurcharge">$0.00</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="label">Dispatch/Broker Fee</span>
+                            <span class="value negative" id="bDispatchFee">-$0.00</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="label">Fuel Cost (<span id="bGallons">131</span> gal × $<span id="bFuelPrice">3.50</span>)</span>
+                            <span class="value negative" id="bFuelCost">-$457.69</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span class="label">Operating Costs (<span id="bTotalMiles">850</span> mi × $<span id="bCpm">0.45</span>)</span>
+                            <span class="value negative" id="bOperatingCost">-$382.50</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span class="label">Net Profit</span>
+                            <span class="value" id="bNetProfit">$1,659.81</span>
+                        </div>
+                    </div>
+
+                    <!-- Verdict -->
+                    <div class="verdict-box" id="verdictBox">
+                        <div class="verdict-icon" id="verdictIcon">✅</div>
+                        <div class="verdict-text" id="verdictText">Good Load!</div>
+                        <div class="verdict-detail" id="verdictDetail">Net rate of $1.95/mi is above the $1.50/mi threshold</div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        <button class="btn btn-primary" onclick="saveToBalanceBooks()">💾 Save to BalanceBooks</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="tools-nav">
+                <a href="/fuel-converter">⛽ Fuel Converter</a>
+                <a href="/ifta-calculator">📊 IFTA Calculator</a>
+                <a href="/load-calculator">💰 Load Calculator</a>
+                <a href="/deadhead-calculator">🛣️ Deadhead Calculator</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
+        </div>
+    </footer>
+
+    <script>
+        const GOOD_RPM_THRESHOLD = 1.50;
+        const MARGINAL_RPM_THRESHOLD = 1.00;
+
+        function calculate() {
+            // Get inputs
+            const lineHaul = parseFloat(document.getElementById('lineHaul').value) || 0;
+            const fuelSurcharge = parseFloat(document.getElementById('fuelSurcharge').value) || 0;
+            const loadedMiles = parseFloat(document.getElementById('loadedMiles').value) || 0;
+            const deadheadMiles = parseFloat(document.getElementById('deadheadMiles').value) || 0;
+            const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 3.50;
+            const mpg = parseFloat(document.getElementById('mpg').value) || 6.5;
+            const costPerMile = parseFloat(document.getElementById('costPerMile').value) || 0.45;
+            const dispatchFee = parseFloat(document.getElementById('dispatchFee').value) || 0;
+
+            // Calculations
+            const totalMiles = loadedMiles + deadheadMiles;
+            const grossRevenue = lineHaul + fuelSurcharge;
+            const dispatchCost = grossRevenue * (dispatchFee / 100);
+            const netRevenue = grossRevenue - dispatchCost;
+            const gallons = totalMiles / mpg;
+            const fuelCost = gallons * fuelPrice;
+            const operatingCost = totalMiles * costPerMile;
+            const netProfit = netRevenue - fuelCost - operatingCost;
+            const rpmGross = totalMiles > 0 ? grossRevenue / totalMiles : 0;
+            const rpmNet = totalMiles > 0 ? netProfit / totalMiles : 0;
+            const profitMargin = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
+
+            // Update display
+            document.getElementById('grossRevenue').textContent = '$' + grossRevenue.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('totalMiles').textContent = totalMiles.toLocaleString();
+            document.getElementById('milesBreakdown').textContent = `${loadedMiles} loaded + ${deadheadMiles} empty`;
+            document.getElementById('fuelCost').textContent = '$' + fuelCost.toFixed(0);
+            document.getElementById('fuelGallons').textContent = gallons.toFixed(0) + ' gallons';
+            document.getElementById('netProfit').textContent = '$' + netProfit.toFixed(0);
+            document.getElementById('rpmGross').textContent = '$' + rpmGross.toFixed(2);
+            document.getElementById('rpmNet').textContent = '$' + rpmNet.toFixed(2);
+            document.getElementById('profitMargin').textContent = profitMargin.toFixed(0) + '%';
+
+            // Breakdown
+            document.getElementById('bLineHaul').textContent = '$' + lineHaul.toFixed(2);
+            document.getElementById('bFuelSurcharge').textContent = '$' + fuelSurcharge.toFixed(2);
+            document.getElementById('bDispatchFee').textContent = '-$' + dispatchCost.toFixed(2);
+            document.getElementById('bGallons').textContent = gallons.toFixed(0);
+            document.getElementById('bFuelPrice').textContent = fuelPrice.toFixed(2);
+            document.getElementById('bFuelCost').textContent = '-$' + fuelCost.toFixed(2);
+            document.getElementById('bTotalMiles').textContent = totalMiles;
+            document.getElementById('bCpm').textContent = costPerMile.toFixed(2);
+            document.getElementById('bOperatingCost').textContent = '-$' + operatingCost.toFixed(2);
+            document.getElementById('bNetProfit').textContent = (netProfit >= 0 ? '$' : '-$') + Math.abs(netProfit).toFixed(2);
+
+            // Color coding for profit
+            const profitEl = document.getElementById('netProfit');
+            const profitCard = document.getElementById('profitCard');
+            const bNetProfit = document.getElementById('bNetProfit');
+            
+            profitCard.classList.remove('green', 'red', 'yellow');
+            if (netProfit >= 0) {
+                profitEl.classList.remove('red', 'yellow');
+                profitEl.classList.add('green');
+                profitCard.classList.add('green');
+                bNetProfit.classList.remove('negative');
+            } else {
+                profitEl.classList.remove('green', 'yellow');
+                profitEl.classList.add('red');
+                profitCard.classList.add('red');
+                bNetProfit.classList.add('negative');
+            }
+
+            // Verdict
+            const verdictBox = document.getElementById('verdictBox');
+            const verdictIcon = document.getElementById('verdictIcon');
+            const verdictText = document.getElementById('verdictText');
+            const verdictDetail = document.getElementById('verdictDetail');
+
+            verdictBox.classList.remove('good', 'bad', 'marginal');
+
+            if (rpmNet >= GOOD_RPM_THRESHOLD) {
+                verdictBox.classList.add('good');
+                verdictIcon.textContent = '✅';
+                verdictText.textContent = 'Good Load!';
+                verdictDetail.textContent = `Net rate of $${rpmNet.toFixed(2)}/mi is above the $${GOOD_RPM_THRESHOLD.toFixed(2)}/mi threshold`;
+            } else if (rpmNet >= MARGINAL_RPM_THRESHOLD) {
+                verdictBox.classList.add('marginal');
+                verdictIcon.textContent = '⚠️';
+                verdictText.textContent = 'Marginal Load';
+                verdictDetail.textContent = `Net rate of $${rpmNet.toFixed(2)}/mi is below ideal but may be acceptable`;
+            } else if (rpmNet > 0) {
+                verdictBox.classList.add('bad');
+                verdictIcon.textContent = '❌';
+                verdictText.textContent = 'Poor Load';
+                verdictDetail.textContent = `Net rate of $${rpmNet.toFixed(2)}/mi is too low. Consider negotiating or passing.`;
+            } else {
+                verdictBox.classList.add('bad');
+                verdictIcon.textContent = '🚫';
+                verdictText.textContent = 'Losing Money!';
+                verdictDetail.textContent = `This load would cost you money. Do not take it.`;
+            }
+
+            // RPM Net color
+            const rpmNetEl = document.getElementById('rpmNet');
+            rpmNetEl.classList.remove('green', 'red', 'yellow');
+            if (rpmNet >= GOOD_RPM_THRESHOLD) {
+                rpmNetEl.classList.add('green');
+            } else if (rpmNet >= MARGINAL_RPM_THRESHOLD) {
+                rpmNetEl.classList.add('yellow');
+            } else {
+                rpmNetEl.classList.add('red');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('lineHaul').value = 2500;
+            document.getElementById('fuelSurcharge').value = 0;
+            document.getElementById('loadedMiles').value = 800;
+            document.getElementById('deadheadMiles').value = 50;
+            document.getElementById('fuelPrice').value = 3.50;
+            document.getElementById('mpg').value = 6.5;
+            document.getElementById('costPerMile').value = 0.45;
+            document.getElementById('dispatchFee').value = 0;
+            calculate();
+        }
+
+        // ============ BALANCEBOOKS INTEGRATION ============
+        function saveToBalanceBooks() {
+            const lineHaul = parseFloat(document.getElementById('lineHaul').value) || 0;
+            const loadedMiles = parseFloat(document.getElementById('loadedMiles').value) || 0;
+            
+            if (lineHaul === 0 || loadedMiles === 0) {
+                alert('Please enter at least the line haul rate and loaded miles.');
+                return;
+            }
+
+            // Get all calculation results
+            const payload = {
+                source: 'load-calculator',
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                load: {
+                    lineHaul: parseFloat(document.getElementById('lineHaul').value) || 0,
+                    fuelSurcharge: parseFloat(document.getElementById('fuelSurcharge').value) || 0,
+                    loadedMiles: parseFloat(document.getElementById('loadedMiles').value) || 0,
+                    deadheadMiles: parseFloat(document.getElementById('deadheadMiles').value) || 0,
+                    fuelPrice: parseFloat(document.getElementById('fuelPrice').value) || 3.50,
+                    mpg: parseFloat(document.getElementById('mpg').value) || 6.5,
+                    costPerMile: parseFloat(document.getElementById('costPerMile').value) || 0.45,
+                    dispatchFee: parseFloat(document.getElementById('dispatchFee').value) || 0,
+                    // Results from UI
+                    grossRevenue: parseFloat(document.getElementById('grossRevenue')?.textContent.replace(/[$,]/g, '')) || 0,
+                    netProfit: parseFloat(document.getElementById('netProfit')?.textContent.replace(/[$,]/g, '')) || 0,
+                    rpmGross: parseFloat(document.getElementById('rpmGross')?.textContent.replace(/[$,]/g, '')) || 0,
+                    rpmNet: parseFloat(document.getElementById('rpmNet')?.textContent.replace(/[$,]/g, '')) || 0,
+                    profitMargin: parseFloat(document.getElementById('profitMargin')?.textContent.replace('%', '')) || 0,
+                    verdict: document.getElementById('verdictText')?.textContent || 'Unknown'
+                }
+            };
+
+            try {
+                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
+                
+                const msg = `Save this load to BalanceBooks?\n\n` +
+                    `• Line Haul: $${payload.load.lineHaul.toLocaleString()}\n` +
+                    `• Miles: ${payload.load.loadedMiles + payload.load.deadheadMiles} total\n` +
+                    `• Verdict: ${payload.load.verdict}\n\n` +
+                    `Click OK to open BalanceBooks Trucking.`;
+                
+                if (confirm(msg)) {
+                    window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
+                }
+            } catch (e) {
+                console.error('Integration error:', e);
+                alert('Could not save load data. Please try again.');
+            }
+        }
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>

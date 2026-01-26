@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Trucking Tools | IFTA, Fuel Log, Load Calculator | BalanceBooks</title>
+    <meta name="description" content="Free tools for truckers and owner-operators. IFTA calculator, fuel card converter, load profitability calculator, cost per mile, and more. No signup required.">
+    <meta name="keywords" content="trucker tools, IFTA calculator, fuel card converter, load profitability, cost per mile calculator, owner operator tools, trucking calculator">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f97316">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Free Trucking Tools | BalanceBooks">
+    <meta property="og:description" content="Free calculators and converters for truckers. IFTA, fuel logs, load profitability, and more.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tools.balancebooksapp.com/">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --orange-600: #ea580c;
+            --teal-500: #14b8a6;
+            --green-500: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .logo-badge {
+            background: var(--navy-700);
+            color: var(--orange-400);
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--navy-600);
+        }
+
+        .header-cta {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-600);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--orange-400);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--navy-300);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--orange-400);
+        }
+
+        .hero-stat .label {
+            font-size: 14px;
+            color: var(--navy-400);
+        }
+
+        /* Tools Grid */
+        .tools-section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-title h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .section-title p {
+            color: var(--navy-400);
+            font-size: 16px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .tool-card {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--orange-500);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .tool-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tool-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .tool-icon.teal {
+            background: linear-gradient(135deg, var(--teal-500) 0%, #0d9488 100%);
+        }
+
+        .tool-icon.green {
+            background: linear-gradient(135deg, var(--green-500) 0%, #16a34a 100%);
+        }
+
+        .tool-card-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .tool-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tool-badge.popular {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--orange-400);
+        }
+
+        .tool-badge.new {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--green-500);
+        }
+
+        .tool-card p {
+            color: var(--navy-300);
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .tool-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tool-feature {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--navy-700);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--navy-300);
+        }
+
+        .tool-card-footer {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--navy-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tool-cta {
+            color: var(--orange-400);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-card:hover .tool-cta {
+            gap: 10px;
+        }
+
+        /* Fuel Card Section */
+        .fuel-cards-section {
+            padding: 60px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        .fuel-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .fuel-card-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 24px 16px;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+        }
+
+        .fuel-card-link:hover {
+            border-color: var(--orange-500);
+            transform: translateY(-2px);
+        }
+
+        .fuel-card-link .icon {
+            font-size: 32px;
+        }
+
+        .fuel-card-link .name {
+            font-weight: 600;
+            color: white;
+            font-size: 14px;
+        }
+
+        .fuel-card-link .desc {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, var(--orange-600) 0%, var(--orange-500) 50%, #f59e0b 100%);
+            border-radius: 24px;
+            padding: 64px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0z' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .cta-box h2 {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cta-box p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .cta-btn.primary {
+            background: white;
+            color: var(--orange-600);
+        }
+
+        .cta-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .cta-btn.secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .cta-btn.secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 0;
+            border-top: 1px solid var(--navy-700);
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .privacy-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-700);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--navy-300);
+            margin-top: 24px;
+        }
+
+        .privacy-note .icon {
+            color: var(--green-500);
+        }
+
+        @media (max-width: 768px) {
+            .header-cta { display: none; }
+            .hero { padding: 48px 0 40px; }
+            .hero-stats { gap: 32px; }
+            .tools-grid { grid-template-columns: 1fr; }
+            .cta-box { padding: 48px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">🚛</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                    <span class="logo-badge">Tools</span>
+                </a>
+                <div class="header-cta">
+                    <a href="https://trucking.balancebooksapp.com" class="btn btn-primary">Open App →</a>
+                </div>
+                <!-- Mobile: Show menu button, hide CTA -->
+                <button class="mobile-menu-btn" onclick="document.querySelector('.mobile-nav').classList.toggle('open')" aria-label="Menu">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-badge">🆓 100% Free • No Signup Required</div>
+                <h1>Free Tools for <span>Truckers</span></h1>
+                <p>Calculators and converters built for owner-operators. Your data stays in your browser — nothing uploaded, ever.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="number">6</div>
+                        <div class="label">Free Tools</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="number">7+</div>
+                        <div class="label">Fuel Cards Supported</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="number">0</div>
+                        <div class="label">Data Uploaded</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tools-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>🧰 Trucking Tools</h2>
+                    <p>Everything you need to manage your trucking business</p>
+                </div>
+
+                <div class="tools-grid">
+                    <!-- Fuel Card Converter -->
+                    <a href="/fuel-converter" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon">⛽</div>
+                            <div>
+                                <h3>Fuel Card Converter</h3>
+                                <span class="tool-badge popular">Most Popular</span>
+                            </div>
+                        </div>
+                        <p>Convert fuel card statements from Love's, Pilot, Comdata, EFS, WEX, Fuelman, and TCS into clean spreadsheets.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">📄 CSV Export</span>
+                            <span class="tool-feature">🔍 Auto-Detect</span>
+                            <span class="tool-feature">📊 Excel Ready</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+
+                    <!-- IFTA Calculator -->
+                    <a href="/ifta-calculator" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon teal">📊</div>
+                            <div>
+                                <h3>IFTA Calculator</h3>
+                                <span class="tool-badge new">New</span>
+                            </div>
+                        </div>
+                        <p>Calculate your quarterly IFTA tax liability. Enter miles and fuel by state, get instant tax owed or refund amounts.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">🗺️ All 48 States</span>
+                            <span class="tool-feature">💰 Tax Rates</span>
+                            <span class="tool-feature">📋 Report Ready</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+
+                    <!-- Load Profitability -->
+                    <a href="/load-calculator" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon green">💰</div>
+                            <div>
+                                <h3>Load Profitability</h3>
+                                <span class="tool-badge new">New</span>
+                            </div>
+                        </div>
+                        <p>Calculate the true profit of any load before you book it. Factor in fuel, miles, deadhead, and expenses.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">📍 Route Cost</span>
+                            <span class="tool-feature">⛽ Fuel Est.</span>
+                            <span class="tool-feature">💵 Net Profit</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+
+                    <!-- Cost Per Mile -->
+                    <a href="/cost-per-mile" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon">🛣️</div>
+                            <div>
+                                <h3>Cost Per Mile</h3>
+                            </div>
+                        </div>
+                        <p>Know your true operating cost per mile. Track fixed and variable expenses to set profitable rates.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">📈 11 Categories</span>
+                            <span class="tool-feature">🔄 Monthly/Annual</span>
+                            <span class="tool-feature">📊 Breakdown</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+
+                    <!-- Deadhead Calculator -->
+                    <a href="/deadhead-calculator" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon teal">🔄</div>
+                            <div>
+                                <h3>Deadhead Calculator</h3>
+                            </div>
+                        </div>
+                        <p>Calculate the true cost of empty miles. Know when to take a load vs. deadhead to a better market.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">📍 Empty Miles</span>
+                            <span class="tool-feature">⛽ Fuel Cost</span>
+                            <span class="tool-feature">⚖️ Break-Even</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+
+                    <!-- Per Diem Tracker -->
+                    <a href="/per-diem" class="tool-card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon green">📅</div>
+                            <div>
+                                <h3>Per Diem Calculator</h3>
+                            </div>
+                        </div>
+                        <p>Track per diem for tax deductions. 2024-2025 IRS rates included. Calculate your annual tax savings.</p>
+                        <div class="tool-features">
+                            <span class="tool-feature">📆 Day Counter</span>
+                            <span class="tool-feature">💵 $69/day Rate</span>
+                            <span class="tool-feature">🧾 Tax Savings</span>
+                        </div>
+                        <div class="tool-card-footer">
+                            <span class="tool-cta">Open Tool <span>→</span></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fuel Card Specific Pages -->
+        <section class="fuel-cards-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>⛽ Fuel Card Converters</h2>
+                    <p>Direct links for specific fuel card providers</p>
+                </div>
+
+                <div class="fuel-cards-grid">
+                    <a href="/loves-converter" class="fuel-card-link">
+                        <span class="icon">🏪</span>
+                        <span class="name">Love's</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/pilot-converter" class="fuel-card-link">
+                        <span class="icon">✈️</span>
+                        <span class="name">Pilot Flying J</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/comdata-converter" class="fuel-card-link">
+                        <span class="icon">💳</span>
+                        <span class="name">Comdata</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/efs-converter" class="fuel-card-link">
+                        <span class="icon">💳</span>
+                        <span class="name">EFS</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/wex-converter" class="fuel-card-link">
+                        <span class="icon">💳</span>
+                        <span class="name">WEX</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/fuelman-converter" class="fuel-card-link">
+                        <span class="icon">💳</span>
+                        <span class="name">Fuelman</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/tcs-converter" class="fuel-card-link">
+                        <span class="icon">💳</span>
+                        <span class="name">TCS</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                    <a href="/ta-petro-converter" class="fuel-card-link">
+                        <span class="icon">⛽</span>
+                        <span class="name">TA/Petro</span>
+                        <span class="desc">CSV Converter</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-box">
+                    <h2>Ready to Go Pro?</h2>
+                    <p>Get all these tools plus full expense tracking, IFTA reporting, load management, and more in BalanceBooks for Trucking.</p>
+                    <div class="cta-buttons">
+                        <a href="https://trucking.balancebooksapp.com" class="cta-btn primary">
+                            🚛 Open Trucking App →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Built for truckers, by people who get it.</p>
+            <div class="footer-links">
+                <a href="https://trucking.balancebooksapp.com">Trucking App</a>
+                <a href="https://app.balancebooksapp.com">Personal Finance</a>
+            </div>
+            <div class="privacy-note">
+                <span class="icon">🔒</span>
+                All tools run 100% in your browser. Your data is never uploaded or stored on any server.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Deadhead Calculator | Empty Miles Cost | BalanceBooks</title>
+    <meta name="description" content="Free deadhead calculator for truckers. Calculate the true cost of empty miles and determine if a load is worth the drive.">
+    <meta name="keywords" content="deadhead calculator, empty miles cost, trucker deadhead, trucking calculator, owner operator">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/deadhead-calculator">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --green-500: #22c55e;
+            --red-500: #ef4444;
+            --yellow-500: #eab308;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(20, 184, 166, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(249, 115, 22, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--teal-500) 0%, var(--teal-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .hero {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--teal-400) 0%, var(--teal-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--navy-300);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-body {
+            padding: 32px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        .input-wrapper .suffix {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-400);
+            font-size: 12px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--navy-900);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--teal-500);
+        }
+
+        .form-group input.has-prefix {
+            padding-left: 32px;
+        }
+
+        .form-group input.has-suffix {
+            padding-right: 50px;
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--navy-700);
+            margin: 32px 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-card {
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-card.highlight {
+            border-width: 2px;
+            border-color: var(--teal-500);
+            background: rgba(20, 184, 166, 0.1);
+        }
+
+        .result-card .label {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-bottom: 8px;
+        }
+
+        .result-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-card .value.teal { color: var(--teal-400); }
+        .result-card .value.orange { color: var(--orange-400); }
+        .result-card .value.red { color: var(--red-500); }
+        .result-card .value.green { color: var(--green-500); }
+
+        .result-card .sub {
+            font-size: 11px;
+            color: var(--navy-400);
+            margin-top: 4px;
+        }
+
+        .breakeven-box {
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+            border: 2px solid var(--navy-600);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .breakeven-box h4 {
+            font-size: 14px;
+            color: var(--navy-300);
+            margin-bottom: 8px;
+        }
+
+        .breakeven-box .amount {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--teal-400);
+        }
+
+        .breakeven-box .note {
+            font-size: 13px;
+            color: var(--navy-400);
+            margin-top: 8px;
+        }
+
+        .tip-box {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .tip-box h5 {
+            font-size: 14px;
+            color: var(--orange-400);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-box p {
+            font-size: 13px;
+            color: var(--navy-300);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-600);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--teal-500) 0%, #0d9488 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">🔄</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1><span>Deadhead</span> Calculator</h1>
+                <p>Calculate the true cost of empty miles. Know when to take a cheaper load vs. deadhead to a better market.</p>
+            </section>
+
+            <div class="app-container">
+                <div class="app-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>🛣️ Deadhead Miles</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="deadheadMiles" class="has-suffix" value="150" oninput="calculate()">
+                                <span class="suffix">mi</span>
+                            </div>
+                            <span class="hint">Empty miles to the pickup</span>
+                        </div>
+                        <div class="form-group">
+                            <label>⛽ Fuel Price</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="fuelPrice" class="has-prefix has-suffix" value="3.50" step="0.05" oninput="calculate()">
+                                <span class="suffix">/gal</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>🚛 Truck MPG</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="mpg" class="has-suffix" value="6.5" step="0.1" oninput="calculate()">
+                                <span class="suffix">mpg</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>💸 Other Costs</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="otherCosts" class="has-prefix has-suffix" value="0.35" step="0.01" oninput="calculate()">
+                                <span class="suffix">/mi</span>
+                            </div>
+                            <span class="hint">Maintenance, wear, tires, etc.</span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>⏱️ Time Cost (Optional)</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">$</span>
+                                <input type="number" id="hourlyRate" class="has-prefix has-suffix" value="25" oninput="calculate()">
+                                <span class="suffix">/hr</span>
+                            </div>
+                            <span class="hint">Your hourly value (assumes 55 mph average)</span>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="label">Fuel Cost</div>
+                            <div class="value orange" id="fuelCost">$80.77</div>
+                            <div class="sub" id="gallonsUsed">23.1 gallons</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Other Costs</div>
+                            <div class="value teal" id="operatingCost">$52.50</div>
+                            <div class="sub">wear + maint</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Time Cost</div>
+                            <div class="value teal" id="timeCost">$68.18</div>
+                            <div class="sub" id="timeHours">2.7 hours</div>
+                        </div>
+                    </div>
+
+                    <div class="result-card highlight">
+                        <div class="label">Total Deadhead Cost</div>
+                        <div class="value red" id="totalCost">$201.45</div>
+                        <div class="sub">Cost of driving <span id="milesDisplay">150</span> empty miles</div>
+                    </div>
+
+                    <div class="breakeven-box">
+                        <h4>💡 Minimum Load Rate Needed</h4>
+                        <div class="amount" id="minRate">$201.45</div>
+                        <div class="note">A load from your current location must pay at least this much more than a local load to be worth the deadhead</div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h5>💡 Pro Tip</h5>
+                        <p>If a distant load pays $<span id="rateNeeded">201</span> more than a local one, it's worth the drive. Otherwise, take the closer load or wait for a better option.</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        <a href="/load-calculator" class="btn btn-secondary">💰 Load Calculator</a>
+                        <a href="https://trucking.balancebooksapp.com" class="btn btn-primary" target="_blank">🚀 Open BalanceBooks</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="tools-nav">
+                <a href="/">🏠 All Tools</a>
+                <a href="/fuel-converter">⛽ Fuel Converter</a>
+                <a href="/ifta-calculator">📊 IFTA Calculator</a>
+                <a href="/load-calculator">💰 Load Calculator</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
+        </div>
+    </footer>
+
+    <script>
+        function calculate() {
+            const deadheadMiles = parseFloat(document.getElementById('deadheadMiles').value) || 0;
+            const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 3.50;
+            const mpg = parseFloat(document.getElementById('mpg').value) || 6.5;
+            const otherCosts = parseFloat(document.getElementById('otherCosts').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+
+            // Calculate costs
+            const gallons = deadheadMiles / mpg;
+            const fuelCost = gallons * fuelPrice;
+            const operatingCost = deadheadMiles * otherCosts;
+            const hours = deadheadMiles / 55; // 55 mph average
+            const timeCost = hours * hourlyRate;
+            const totalCost = fuelCost + operatingCost + timeCost;
+
+            // Update display
+            document.getElementById('fuelCost').textContent = '$' + fuelCost.toFixed(2);
+            document.getElementById('gallonsUsed').textContent = gallons.toFixed(1) + ' gallons';
+            document.getElementById('operatingCost').textContent = '$' + operatingCost.toFixed(2);
+            document.getElementById('timeCost').textContent = '$' + timeCost.toFixed(2);
+            document.getElementById('timeHours').textContent = hours.toFixed(1) + ' hours';
+            document.getElementById('totalCost').textContent = '$' + totalCost.toFixed(2);
+            document.getElementById('milesDisplay').textContent = deadheadMiles;
+            document.getElementById('minRate').textContent = '$' + totalCost.toFixed(2);
+            document.getElementById('rateNeeded').textContent = Math.round(totalCost);
+        }
+
+        function resetForm() {
+            document.getElementById('deadheadMiles').value = 150;
+            document.getElementById('fuelPrice').value = 3.50;
+            document.getElementById('mpg').value = 6.5;
+            document.getElementById('otherCosts').value = 0.35;
+            document.getElementById('hourlyRate').value = 25;
+            calculate();
+        }
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>

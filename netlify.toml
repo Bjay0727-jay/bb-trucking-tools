@@ -1,0 +1,111 @@
+# Netlify Configuration for BalanceBooks Tools
+# https://tools.balancebooksapp.com
+
+[build]
+  publish = "."
+
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'"
+
+# Cache static assets
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "application/manifest+json"
+
+# Pretty URLs
+[[redirects]]
+  from = "/fuel-converter"
+  to = "/fuel-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ifta-calculator"
+  to = "/ifta-calculator/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/load-calculator"
+  to = "/load-calculator/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cost-per-mile"
+  to = "/cost-per-mile/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/deadhead-calculator"
+  to = "/deadhead-calculator/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/per-diem"
+  to = "/per-diem/index.html"
+  status = 200
+
+# Fuel card provider pages
+[[redirects]]
+  from = "/loves-converter"
+  to = "/loves-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/pilot-converter"
+  to = "/pilot-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/comdata-converter"
+  to = "/comdata-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/efs-converter"
+  to = "/efs-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/wex-converter"
+  to = "/wex-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/fuelman-converter"
+  to = "/fuelman-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/tcs-converter"
+  to = "/tcs-converter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/ta-petro-converter"
+  to = "/ta-petro-converter/index.html"
+  status = 200
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404

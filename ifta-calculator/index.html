@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free IFTA Calculator | Fuel Tax by State | BalanceBooks</title>
+    <meta name="description" content="Free IFTA fuel tax calculator for owner-operators. Calculate fuel tax owed or refund by state. Supports all 48 continental US states and Canadian provinces.">
+    <meta name="keywords" content="IFTA calculator, fuel tax calculator, trucker tax, state fuel tax, owner operator IFTA, quarterly fuel tax">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/ifta-calculator">
+    <meta property="og:title" content="Free IFTA Fuel Tax Calculator | BalanceBooks">
+    <meta property="og:description" content="Calculate your quarterly IFTA fuel tax in seconds. Free tool for truckers and owner-operators.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-500: #475569;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --orange-600: #ea580c;
+            --teal-500: #14b8a6;
+            --teal-400: #2dd4bf;
+            --green-500: #22c55e;
+            --green-100: #dcfce7;
+            --red-500: #ef4444;
+            --red-100: #fee2e2;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--teal-500) 0%, var(--teal-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .logo-badge {
+            background: var(--navy-700);
+            color: var(--teal-400);
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--navy-600);
+        }
+
+        .header-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-link {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: var(--navy-300);
+        }
+
+        .header-link:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+
+        .header-link.primary {
+            color: var(--navy-900);
+            background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
+        }
+
+        .header-link.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--teal-400) 0%, var(--teal-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--navy-300);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-header {
+            background: var(--navy-900);
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--navy-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .app-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quarter-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quarter-btn {
+            padding: 8px 16px;
+            background: var(--navy-700);
+            border: 1px solid var(--navy-600);
+            border-radius: 8px;
+            color: var(--navy-300);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .quarter-btn:hover {
+            background: var(--navy-600);
+            color: white;
+        }
+
+        .quarter-btn.active {
+            background: var(--teal-500);
+            border-color: var(--teal-500);
+            color: white;
+        }
+
+        .app-body {
+            padding: 32px;
+        }
+
+        .input-section {
+            margin-bottom: 32px;
+        }
+
+        .input-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .state-input {
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .state-input:focus-within {
+            border-color: var(--teal-500);
+        }
+
+        .state-input .state-code {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--teal-400);
+            min-width: 28px;
+        }
+
+        .state-input input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+            width: 100%;
+        }
+
+        .state-input input::placeholder {
+            color: var(--navy-500);
+        }
+
+        .state-input .unit {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        .totals-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 20px;
+            background: var(--navy-900);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .total-card {
+            text-align: center;
+        }
+
+        .total-card .label {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-bottom: 4px;
+        }
+
+        .total-card .value {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .total-card .value.teal { color: var(--teal-400); }
+        .total-card .value.orange { color: var(--orange-400); }
+        .total-card .value.green { color: var(--green-500); }
+        .total-card .value.red { color: var(--red-500); }
+
+        .mpg-input {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .mpg-input label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .mpg-input input {
+            width: 80px;
+            padding: 10px 12px;
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+            outline: none;
+        }
+
+        .mpg-input input:focus {
+            border-color: var(--teal-500);
+        }
+
+        .mpg-input .hint {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        .results-section {
+            margin-top: 32px;
+        }
+
+        .results-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--navy-700);
+            border-radius: 12px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .results-table th {
+            background: var(--navy-900);
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--navy-300);
+            border-bottom: 1px solid var(--navy-700);
+            white-space: nowrap;
+        }
+
+        .results-table th.right,
+        .results-table td.right {
+            text-align: right;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--navy-700);
+            color: var(--navy-200);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table tr:hover td {
+            background: var(--navy-900);
+        }
+
+        .results-table .state-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 500;
+        }
+
+        .results-table .positive {
+            color: var(--green-500);
+        }
+
+        .results-table .negative {
+            color: var(--red-500);
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+            border: 2px solid var(--navy-600);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .summary-box h4 {
+            font-size: 14px;
+            color: var(--navy-300);
+            margin-bottom: 8px;
+        }
+
+        .summary-box .amount {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .summary-box .amount.owed {
+            color: var(--red-500);
+        }
+
+        .summary-box .amount.refund {
+            color: var(--green-500);
+        }
+
+        .summary-box .note {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-top: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-600);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+
+        @media (max-width: 768px) {
+            .app-body { padding: 20px; }
+            .state-grid { grid-template-columns: 1fr; }
+            .header-links { display: none; }
+            .quarter-selector { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/fuel-converter" class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                    <span class="logo-badge">Tools</span>
+                </a>
+                <div class="header-links">
+                    <a href="/fuel-converter" class="header-link">Fuel Converter</a>
+                    <a href="https://trucking.balancebooksapp.com" class="header-link primary">Get Full App →</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1>IFTA <span>Tax Calculator</span></h1>
+                <p>Calculate your quarterly fuel tax by state. Enter miles driven and gallons purchased per state.</p>
+            </section>
+
+            <div class="app-container">
+                <div class="app-header">
+                    <h2>📊 IFTA Quarterly Report</h2>
+                    <div class="quarter-selector">
+                        <button class="quarter-btn" data-q="Q1">Q1 (Jan-Mar)</button>
+                        <button class="quarter-btn active" data-q="Q2">Q2 (Apr-Jun)</button>
+                        <button class="quarter-btn" data-q="Q3">Q3 (Jul-Sep)</button>
+                        <button class="quarter-btn" data-q="Q4">Q4 (Oct-Dec)</button>
+                    </div>
+                </div>
+
+                <div class="app-body">
+                    <!-- MPG Input -->
+                    <div class="mpg-input">
+                        <label>🚛 Fleet Average MPG:</label>
+                        <input type="number" id="avgMpg" value="6.5" step="0.1" min="1" max="20">
+                        <span class="hint">Used to calculate taxable gallons per state</span>
+                    </div>
+
+                    <!-- Miles by State -->
+                    <div class="input-section">
+                        <h3>🛣️ Miles Driven by State</h3>
+                        <div class="state-grid" id="milesGrid"></div>
+                    </div>
+
+                    <!-- Gallons by State -->
+                    <div class="input-section">
+                        <h3>⛽ Gallons Purchased by State</h3>
+                        <div class="state-grid" id="gallonsGrid"></div>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="totals-row">
+                        <div class="total-card">
+                            <div class="label">Total Miles</div>
+                            <div class="value teal" id="totalMiles">0</div>
+                        </div>
+                        <div class="total-card">
+                            <div class="label">Total Gallons Purchased</div>
+                            <div class="value orange" id="totalGallons">0</div>
+                        </div>
+                        <div class="total-card">
+                            <div class="label">Taxable Gallons (Miles ÷ MPG)</div>
+                            <div class="value teal" id="taxableGallons">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div class="results-section">
+                        <h3>📋 Tax Calculation by State</h3>
+                        <div class="results-table-wrapper">
+                            <table class="results-table">
+                                <thead>
+                                    <tr>
+                                        <th>State</th>
+                                        <th class="right">Miles</th>
+                                        <th class="right">Taxable Gal</th>
+                                        <th class="right">Purchased</th>
+                                        <th class="right">Net Gal</th>
+                                        <th class="right">Tax Rate</th>
+                                        <th class="right">Tax Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="summary-box">
+                            <h4>Total IFTA Tax</h4>
+                            <div class="amount" id="totalTax">$0.00</div>
+                            <div class="note" id="taxNote">Enter miles and gallons to calculate</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+                            <button class="btn btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
+                            <button class="btn btn-primary" onclick="sendToBalanceBooks()">🚀 Send to BalanceBooks</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="tools-nav">
+                <a href="/fuel-converter">⛽ Fuel Converter</a>
+                <a href="/ifta-calculator">📊 IFTA Calculator</a>
+                <a href="/load-calculator">💰 Load Calculator</a>
+                <a href="/deadhead-calculator">🛣️ Deadhead Calculator</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
+        </div>
+    </footer>
+
+    <script>
+        // 2024/2025 IFTA Tax Rates (diesel) - cents per gallon
+        const STATE_TAX_RATES = {
+            'AL': { name: 'Alabama', rate: 0.29 },
+            'AZ': { name: 'Arizona', rate: 0.26 },
+            'AR': { name: 'Arkansas', rate: 0.285 },
+            'CA': { name: 'California', rate: 0.389 },
+            'CO': { name: 'Colorado', rate: 0.205 },
+            'CT': { name: 'Connecticut', rate: 0.409 },
+            'DE': { name: 'Delaware', rate: 0.22 },
+            'FL': { name: 'Florida', rate: 0.36 },
+            'GA': { name: 'Georgia', rate: 0.324 },
+            'ID': { name: 'Idaho', rate: 0.32 },
+            'IL': { name: 'Illinois', rate: 0.467 },
+            'IN': { name: 'Indiana', rate: 0.54 },
+            'IA': { name: 'Iowa', rate: 0.325 },
+            'KS': { name: 'Kansas', rate: 0.26 },
+            'KY': { name: 'Kentucky', rate: 0.246 },
+            'LA': { name: 'Louisiana', rate: 0.20 },
+            'ME': { name: 'Maine', rate: 0.312 },
+            'MD': { name: 'Maryland', rate: 0.3715 },
+            'MA': { name: 'Massachusetts', rate: 0.24 },
+            'MI': { name: 'Michigan', rate: 0.267 },
+            'MN': { name: 'Minnesota', rate: 0.285 },
+            'MS': { name: 'Mississippi', rate: 0.18 },
+            'MO': { name: 'Missouri', rate: 0.195 },
+            'MT': { name: 'Montana', rate: 0.2975 },
+            'NE': { name: 'Nebraska', rate: 0.296 },
+            'NV': { name: 'Nevada', rate: 0.27 },
+            'NH': { name: 'New Hampshire', rate: 0.222 },
+            'NJ': { name: 'New Jersey', rate: 0.425 },
+            'NM': { name: 'New Mexico', rate: 0.21 },
+            'NY': { name: 'New York', rate: 0.3005 },
+            'NC': { name: 'North Carolina', rate: 0.382 },
+            'ND': { name: 'North Dakota', rate: 0.23 },
+            'OH': { name: 'Ohio', rate: 0.47 },
+            'OK': { name: 'Oklahoma', rate: 0.19 },
+            'OR': { name: 'Oregon', rate: 0.38 },
+            'PA': { name: 'Pennsylvania', rate: 0.741 },
+            'RI': { name: 'Rhode Island', rate: 0.35 },
+            'SC': { name: 'South Carolina', rate: 0.28 },
+            'SD': { name: 'South Dakota', rate: 0.28 },
+            'TN': { name: 'Tennessee', rate: 0.27 },
+            'TX': { name: 'Texas', rate: 0.20 },
+            'UT': { name: 'Utah', rate: 0.32 },
+            'VT': { name: 'Vermont', rate: 0.31 },
+            'VA': { name: 'Virginia', rate: 0.298 },
+            'WA': { name: 'Washington', rate: 0.494 },
+            'WV': { name: 'West Virginia', rate: 0.352 },
+            'WI': { name: 'Wisconsin', rate: 0.329 },
+            'WY': { name: 'Wyoming', rate: 0.24 }
+        };
+
+        // Common trucking states first
+        const PRIORITY_STATES = ['TX', 'CA', 'FL', 'GA', 'IL', 'OH', 'PA', 'TN', 'IN', 'NC', 'MO', 'OK', 'AR', 'KY', 'AL', 'LA', 'MS', 'AZ', 'NM', 'CO'];
+
+        let milesData = {};
+        let gallonsData = {};
+
+        function init() {
+            // Build state inputs
+            const sortedStates = [...PRIORITY_STATES, ...Object.keys(STATE_TAX_RATES).filter(s => !PRIORITY_STATES.includes(s))];
+            
+            const milesGrid = document.getElementById('milesGrid');
+            const gallonsGrid = document.getElementById('gallonsGrid');
+
+            sortedStates.forEach(code => {
+                milesData[code] = 0;
+                gallonsData[code] = 0;
+
+                // Miles input
+                milesGrid.innerHTML += `
+                    <div class="state-input">
+                        <span class="state-code">${code}</span>
+                        <input type="number" placeholder="0" data-state="${code}" data-type="miles" oninput="updateValue(this)">
+                        <span class="unit">mi</span>
+                    </div>
+                `;
+
+                // Gallons input
+                gallonsGrid.innerHTML += `
+                    <div class="state-input">
+                        <span class="state-code">${code}</span>
+                        <input type="number" placeholder="0" step="0.1" data-state="${code}" data-type="gallons" oninput="updateValue(this)">
+                        <span class="unit">gal</span>
+                    </div>
+                `;
+            });
+
+            // Quarter buttons
+            document.querySelectorAll('.quarter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.quarter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // MPG change
+            document.getElementById('avgMpg').addEventListener('input', calculate);
+        }
+
+        function updateValue(input) {
+            const state = input.dataset.state;
+            const type = input.dataset.type;
+            const value = parseFloat(input.value) || 0;
+
+            if (type === 'miles') {
+                milesData[state] = value;
+            } else {
+                gallonsData[state] = value;
+            }
+
+            calculate();
+        }
+
+        function calculate() {
+            const mpg = parseFloat(document.getElementById('avgMpg').value) || 6.5;
+            
+            // Calculate totals
+            const totalMiles = Object.values(milesData).reduce((a, b) => a + b, 0);
+            const totalGallons = Object.values(gallonsData).reduce((a, b) => a + b, 0);
+            const totalTaxableGallons = totalMiles / mpg;
+
+            document.getElementById('totalMiles').textContent = totalMiles.toLocaleString();
+            document.getElementById('totalGallons').textContent = totalGallons.toFixed(1);
+            document.getElementById('taxableGallons').textContent = totalTaxableGallons.toFixed(1);
+
+            // Calculate by state
+            let totalTax = 0;
+            const results = [];
+
+            Object.keys(STATE_TAX_RATES).forEach(code => {
+                const miles = milesData[code] || 0;
+                const purchased = gallonsData[code] || 0;
+
+                if (miles > 0 || purchased > 0) {
+                    const taxableGal = miles / mpg;
+                    const netGal = taxableGal - purchased;
+                    const taxDue = netGal * STATE_TAX_RATES[code].rate;
+                    totalTax += taxDue;
+
+                    results.push({
+                        code,
+                        name: STATE_TAX_RATES[code].name,
+                        miles,
+                        taxableGal,
+                        purchased,
+                        netGal,
+                        rate: STATE_TAX_RATES[code].rate,
+                        taxDue
+                    });
+                }
+            });
+
+            // Sort by absolute tax due
+            results.sort((a, b) => Math.abs(b.taxDue) - Math.abs(a.taxDue));
+
+            // Update results table
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = results.map(r => `
+                <tr>
+                    <td class="state-name">${r.code} - ${r.name}</td>
+                    <td class="right">${r.miles.toLocaleString()}</td>
+                    <td class="right">${r.taxableGal.toFixed(1)}</td>
+                    <td class="right">${r.purchased.toFixed(1)}</td>
+                    <td class="right ${r.netGal >= 0 ? '' : 'negative'}">${r.netGal.toFixed(1)}</td>
+                    <td class="right">$${r.rate.toFixed(3)}</td>
+                    <td class="right ${r.taxDue >= 0 ? 'negative' : 'positive'}">${r.taxDue >= 0 ? '' : '-'}$${Math.abs(r.taxDue).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            if (results.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--navy-400); padding: 24px;">Enter miles and gallons above to see calculations</td></tr>`;
+            }
+
+            // Update summary
+            const taxEl = document.getElementById('totalTax');
+            const noteEl = document.getElementById('taxNote');
+
+            if (totalTax >= 0) {
+                taxEl.textContent = `$${totalTax.toFixed(2)}`;
+                taxEl.className = 'amount owed';
+                noteEl.textContent = 'Amount owed to IFTA';
+            } else {
+                taxEl.textContent = `-$${Math.abs(totalTax).toFixed(2)}`;
+                taxEl.className = 'amount refund';
+                noteEl.textContent = 'Credit/refund from IFTA';
+            }
+        }
+
+        function clearAll() {
+            Object.keys(milesData).forEach(k => milesData[k] = 0);
+            Object.keys(gallonsData).forEach(k => gallonsData[k] = 0);
+            
+            document.querySelectorAll('.state-input input').forEach(input => {
+                input.value = '';
+            });
+
+            calculate();
+        }
+
+        function exportPDF() {
+            // Simple print-based PDF export
+            window.print();
+        }
+
+        // ============ BALANCEBOOKS INTEGRATION ============
+        function sendToBalanceBooks() {
+            // Collect all state data
+            const stateData = [];
+            let totalMiles = 0;
+            let totalGallons = 0;
+            let totalTaxOwed = 0;
+
+            Object.keys(STATE_TAX_RATES).forEach(abbr => {
+                const milesInput = document.querySelector(`input[data-state="${abbr}"][data-field="miles"]`);
+                const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-field="gallons"]`);
+                
+                if (milesInput && gallonsInput) {
+                    const miles = parseFloat(milesInput.value) || 0;
+                    const gallons = parseFloat(gallonsInput.value) || 0;
+                    
+                    if (miles > 0 || gallons > 0) {
+                        const state = STATE_TAX_RATES[abbr];
+                        const mpg = totalMiles > 0 && totalGallons > 0 ? totalMiles / totalGallons : 6.5;
+                        const taxableGallons = miles / mpg;
+                        const taxOwed = (taxableGallons - gallons) * state.rate;
+                        
+                        stateData.push({
+                            state: abbr,
+                            name: state.name,
+                            miles: miles,
+                            gallons: gallons,
+                            taxRate: state.rate,
+                            taxableGallons: taxableGallons,
+                            taxOwed: taxOwed
+                        });
+                        
+                        totalMiles += miles;
+                        totalGallons += gallons;
+                        totalTaxOwed += taxOwed;
+                    }
+                }
+            });
+
+            if (stateData.length === 0) {
+                alert('Please enter miles and gallons for at least one state.');
+                return;
+            }
+
+            // Prepare payload
+            const payload = {
+                source: 'ifta-calculator',
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                quarter: getCurrentQuarter(),
+                year: new Date().getFullYear(),
+                states: stateData,
+                summary: {
+                    totalMiles: totalMiles,
+                    totalGallons: totalGallons,
+                    mpg: totalGallons > 0 ? (totalMiles / totalGallons).toFixed(2) : 0,
+                    totalTaxOwed: totalTaxOwed.toFixed(2),
+                    statesWithActivity: stateData.length
+                }
+            };
+
+            try {
+                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
+                
+                const msg = `Ready to import IFTA data:\n\n` +
+                    `• States: ${stateData.length}\n` +
+                    `• Total Miles: ${totalMiles.toLocaleString()}\n` +
+                    `• Total Gallons: ${totalGallons.toLocaleString()}\n` +
+                    `• Net Tax: $${totalTaxOwed.toFixed(2)}\n\n` +
+                    `Click OK to open BalanceBooks Trucking.`;
+                
+                if (confirm(msg)) {
+                    window.open('https://trucking.balancebooksapp.com/ifta?import=tools', '_blank');
+                }
+            } catch (e) {
+                console.error('Integration error:', e);
+                alert('Could not prepare data. Please try the PDF export instead.');
+            }
+        }
+
+        function getCurrentQuarter() {
+            const month = new Date().getMonth();
+            if (month < 3) return 'Q1';
+            if (month < 6) return 'Q2';
+            if (month < 9) return 'Q3';
+            return 'Q4';
+        }
+
+        // Initialize
+        init();
+        calculate();
+    </script>
+</body>
+</html>

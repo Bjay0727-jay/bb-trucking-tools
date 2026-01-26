@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Per Diem Calculator | Trucker Tax Deduction | BalanceBooks</title>
+    <meta name="description" content="Free per diem calculator for truckers. Calculate your meal deduction using 2024-2025 IRS rates. Track days away from home and maximize your tax savings.">
+    <meta name="keywords" content="per diem calculator, trucker per diem, meal deduction, IRS per diem rate, owner operator taxes, trucker tax deduction">
+    <link rel="canonical" href="https://tools.balancebooksapp.com/per-diem">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-200: #cbd5e1;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+            --teal-500: #14b8a6;
+            --green-500: #22c55e;
+            --green-400: #4ade80;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-200);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--green-500) 0%, var(--green-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-text span { color: var(--orange-400); }
+
+        .hero {
+            text-align: center;
+            padding: 48px 0 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--green-400) 0%, var(--green-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--navy-300);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: var(--navy-800);
+            border: 1px solid var(--navy-600);
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-body {
+            padding: 32px;
+        }
+
+        .rate-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .rate-info .icon {
+            font-size: 32px;
+        }
+
+        .rate-info .content h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .rate-info .content p {
+            font-size: 14px;
+            color: var(--navy-300);
+        }
+
+        .rate-info .rate {
+            margin-left: auto;
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--green-400);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--navy-900);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--green-500);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--navy-400);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--navy-700);
+            margin: 32px 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-card {
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-card.highlight {
+            border-width: 2px;
+            border-color: var(--green-500);
+            background: rgba(34, 197, 94, 0.1);
+            grid-column: 1 / -1;
+        }
+
+        .result-card .label {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-bottom: 8px;
+        }
+
+        .result-card .value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-card .value.green { color: var(--green-400); }
+        .result-card .value.orange { color: var(--orange-400); }
+        .result-card .value.teal { color: var(--teal-500); }
+
+        .result-card .sub {
+            font-size: 12px;
+            color: var(--navy-400);
+            margin-top: 4px;
+        }
+
+        .result-card.highlight .value {
+            font-size: 42px;
+            color: var(--green-400);
+        }
+
+        .tax-bracket {
+            background: var(--navy-900);
+            border: 1px solid var(--navy-700);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .tax-bracket h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .bracket-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--navy-700);
+            font-size: 14px;
+        }
+
+        .bracket-row:last-child {
+            border-bottom: none;
+        }
+
+        .bracket-row .label {
+            color: var(--navy-300);
+        }
+
+        .bracket-row .value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--green-400);
+            font-weight: 600;
+        }
+
+        .tip-box {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .tip-box h5 {
+            font-size: 14px;
+            color: var(--orange-400);
+            margin-bottom: 8px;
+        }
+
+        .tip-box p, .tip-box ul {
+            font-size: 13px;
+            color: var(--navy-300);
+        }
+
+        .tip-box ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: var(--navy-700);
+            color: var(--navy-200);
+            border: 1px solid var(--navy-600);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--green-500) 0%, #16a34a 100%);
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            border-top: 1px solid var(--navy-700);
+        }
+
+        footer p {
+            color: var(--navy-400);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange-400);
+            text-decoration: none;
+        }
+
+        .tools-nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">📅</div>
+                    <div class="logo-text">Balance<span>Books</span></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1><span>Per Diem</span> Calculator</h1>
+                <p>Track your per diem deduction for meals while on the road. Uses 2024-2025 IRS DOT rates for truckers.</p>
+            </section>
+
+            <div class="app-container">
+                <div class="app-body">
+                    <!-- Current Rate Info -->
+                    <div class="rate-info">
+                        <span class="icon">📋</span>
+                        <div class="content">
+                            <h4>2024-2025 IRS DOT Rate</h4>
+                            <p>Special meal allowance for transportation workers</p>
+                        </div>
+                        <div class="rate">$69/day</div>
+                    </div>
+
+                    <!-- Input Form -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>📆 Days Away From Home</label>
+                            <input type="number" id="daysAway" value="250" oninput="calculate()">
+                            <span class="hint">Full days on the road (overnight)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>🌓 Partial Days</label>
+                            <input type="number" id="partialDays" value="24" oninput="calculate()">
+                            <span class="hint">Departure/arrival days (75% rate)</span>
+                        </div>
+                        <div class="form-group">
+                            <label>💵 Your Tax Bracket</label>
+                            <select id="taxBracket" onchange="calculate()">
+                                <option value="0.10">10% ($0 - $11,600)</option>
+                                <option value="0.12">12% ($11,601 - $47,150)</option>
+                                <option value="0.22" selected>22% ($47,151 - $100,525)</option>
+                                <option value="0.24">24% ($100,526 - $191,950)</option>
+                                <option value="0.32">32% ($191,951 - $243,725)</option>
+                                <option value="0.35">35% ($243,726+)</option>
+                            </select>
+                            <span class="hint">Your marginal federal tax rate</span>
+                        </div>
+                        <div class="form-group">
+                            <label>🏛️ State Tax Rate</label>
+                            <input type="number" id="stateRate" value="5" step="0.1" oninput="calculate()">
+                            <span class="hint">Your state income tax % (0 if none)</span>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Results -->
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="label">Full Days Deduction</div>
+                            <div class="value teal" id="fullDaysAmount">$17,250</div>
+                            <div class="sub"><span id="fullDaysCount">250</span> days × $69</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="label">Partial Days Deduction</div>
+                            <div class="value teal" id="partialDaysAmount">$1,242</div>
+                            <div class="sub"><span id="partialDaysCount">24</span> days × $51.75</div>
+                        </div>
+                        <div class="result-card highlight">
+                            <div class="label">Total Per Diem Deduction</div>
+                            <div class="value green" id="totalDeduction">$18,492</div>
+                            <div class="sub">Reduces your taxable income</div>
+                        </div>
+                    </div>
+
+                    <div class="tax-bracket">
+                        <h4>💰 Estimated Tax Savings</h4>
+                        <div class="bracket-row">
+                            <span class="label">Federal Tax Savings (22%)</span>
+                            <span class="value" id="federalSavings">$4,068</span>
+                        </div>
+                        <div class="bracket-row">
+                            <span class="label">State Tax Savings (5%)</span>
+                            <span class="value" id="stateSavings">$925</span>
+                        </div>
+                        <div class="bracket-row">
+                            <span class="label">Self-Employment Tax Savings (15.3%)</span>
+                            <span class="value" id="seSavings">$2,829</span>
+                        </div>
+                        <div class="bracket-row" style="border-top: 2px solid var(--navy-600); margin-top: 8px; padding-top: 16px;">
+                            <span class="label" style="color: white; font-weight: 700;">Total Estimated Tax Savings</span>
+                            <span class="value" id="totalSavings" style="font-size: 20px;">$7,822</span>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h5>📝 Per Diem Rules for Truckers</h5>
+                        <ul>
+                            <li><strong>Full day rate ($69):</strong> Any day you're away from home overnight</li>
+                            <li><strong>Partial day rate (75%):</strong> Day you leave home and day you return</li>
+                            <li><strong>80% deductible:</strong> DOT workers can deduct 80% of per diem (vs 50% for others)</li>
+                            <li><strong>No receipts needed:</strong> Per diem is a flat rate, no meal receipts required</li>
+                            <li><strong>Tax home:</strong> Must have a tax home (permanent residence) to claim</li>
+                        </ul>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+                        <a href="https://trucking.balancebooksapp.com" class="btn btn-primary" target="_blank">🚀 Track in BalanceBooks</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="tools-nav">
+                <a href="/">🏠 All Tools</a>
+                <a href="/fuel-converter">⛽ Fuel Converter</a>
+                <a href="/ifta-calculator">📊 IFTA Calculator</a>
+                <a href="/cost-per-mile">🛣️ Cost Per Mile</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Not tax advice. Consult a tax professional.</p>
+        </div>
+    </footer>
+
+    <script>
+        const DAILY_RATE = 69;
+        const PARTIAL_RATE = DAILY_RATE * 0.75;
+        const DOT_DEDUCTION_RATE = 0.80; // DOT workers can deduct 80% vs 50%
+        const SE_TAX_RATE = 0.153; // Self-employment tax rate
+
+        function calculate() {
+            const fullDays = parseFloat(document.getElementById('daysAway').value) || 0;
+            const partialDays = parseFloat(document.getElementById('partialDays').value) || 0;
+            const taxBracket = parseFloat(document.getElementById('taxBracket').value) || 0.22;
+            const stateRate = (parseFloat(document.getElementById('stateRate').value) || 0) / 100;
+
+            // Calculate deductions
+            const fullDaysAmount = fullDays * DAILY_RATE;
+            const partialDaysAmount = partialDays * PARTIAL_RATE;
+            const totalDeduction = fullDaysAmount + partialDaysAmount;
+
+            // Calculate tax savings (based on 80% deductible for DOT)
+            const deductibleAmount = totalDeduction * DOT_DEDUCTION_RATE;
+            const federalSavings = deductibleAmount * taxBracket;
+            const stateSavings = deductibleAmount * stateRate;
+            const seSavings = deductibleAmount * SE_TAX_RATE;
+            const totalSavings = federalSavings + stateSavings + seSavings;
+
+            // Update display
+            document.getElementById('fullDaysAmount').textContent = '$' + fullDaysAmount.toLocaleString();
+            document.getElementById('fullDaysCount').textContent = fullDays;
+            document.getElementById('partialDaysAmount').textContent = '$' + partialDaysAmount.toLocaleString();
+            document.getElementById('partialDaysCount').textContent = partialDays;
+            document.getElementById('totalDeduction').textContent = '$' + totalDeduction.toLocaleString();
+            document.getElementById('federalSavings').textContent = '$' + federalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('stateSavings').textContent = '$' + stateSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('seSavings').textContent = '$' + seSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('totalSavings').textContent = '$' + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
+        }
+
+        function resetForm() {
+            document.getElementById('daysAway').value = 250;
+            document.getElementById('partialDays').value = 24;
+            document.getElementById('taxBracket').value = '0.22';
+            document.getElementById('stateRate').value = 5;
+            calculate();
+        }
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
