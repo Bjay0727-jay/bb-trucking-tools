@@ -1657,20 +1657,20 @@
                 provider: detectedFormat || 'unknown',
                 rowCount: processedData.length,
                 data: processedData.map(row => ({
-                    date: row.Date || '',
-                    location: row.Location || '',
-                    city: row.City || '',
-                    state: row.State || '',
-                    gallons: parseFloat(row.Gallons) || 0,
-                    pricePerGallon: parseFloat(row['Price/Gal']) || 0,
-                    totalAmount: parseFloat(row.Total) || 0,
-                    fuelType: row['Fuel Type'] || 'Diesel',
-                    odometer: row.Odometer || '',
-                    truckStop: row['Truck Stop'] || detectedFormat || ''
+                    date: row.date || '',
+                    location: row.location || '',
+                    city: row.city || '',
+                    state: row.state || '',
+                    gallons: parseFloat(row.gallons) || 0,
+                    pricePerGallon: parseFloat(row.pricePerGal) || 0,
+                    totalAmount: parseFloat(row.totalCost) || 0,
+                    fuelType: row.fuelType || 'Diesel',
+                    odometer: row.odometer || '',
+                    truckStop: row.truckId || detectedFormat || ''
                 })),
                 summary: {
-                    gallons: processedData.reduce((s, r) => s + (parseFloat(r.Gallons) || 0), 0),
-                    amount: processedData.reduce((s, r) => s + (parseFloat(r.Total) || 0), 0)
+                    gallons: processedData.reduce((s, r) => s + (parseFloat(r.gallons) || 0), 0),
+                    amount: processedData.reduce((s, r) => s + (parseFloat(r.totalCost) || 0), 0)
                 }
             };
 
