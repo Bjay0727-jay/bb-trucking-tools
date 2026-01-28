@@ -1452,7 +1452,17 @@
                 }
 
                 return entry;
-            }).filter(entry => entry.gallons > 0 || entry.totalCost > 0);
+            }).filter(entry => {
+                // Skip summary rows (date contains "total" or is invalid)
+                if (!entry.date || entry.date.toLowerCase().includes('total') || entry.date.length < 8) {
+                    return false;
+                }
+                // Skip non-fuel transactions (0 gallons)
+                if (!entry.gallons || entry.gallons <= 0) {
+                    return false;
+                }
+                return true;
+            });
 
             // Update preview
             updatePreview();
