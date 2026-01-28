@@ -1116,17 +1116,17 @@
             wex: {
                 name: "WEX",
                 icon: "💳",
-                patterns: ["wex", "wright express"],
+                patterns: ["wex", "wright express", "merchant state", "price per gallon", "prompted odometer", "vehicle name"],
                 columns: {
-                    date: ["transaction date", "date", "purchase date"],
-                    location: ["merchant", "site", "location name"],
-                    state: ["state", "merchant state"],
-                    gallons: ["gallons", "fuel quantity", "qty"],
-                    pricePerGal: ["price/gallon", "ppg", "unit price"],
-                    totalCost: ["total", "amount", "purchase amount"],
-                    odometer: ["odometer", "mileage"],
-                    truckId: ["vehicle id", "unit", "vehicle number"],
-                    driverName: ["driver", "cardholder name"]
+                    date: ["transaction date (gmt)", "transaction date", "date", "purchase date"],
+                    location: ["merchant", "site", "location name", "merchant name"],
+                    state: ["merchant state", "state"],
+                    gallons: ["gallons", "fuel quantity", "qty", "quantity"],
+                    pricePerGal: ["price per gallon", "price/gallon", "ppg", "unit price"],
+                    totalCost: ["amount", "total", "purchase amount", "total amount"],
+                    odometer: ["prompted odometer", "odometer", "mileage"],
+                    truckId: ["vehicle name", "vehicle id", "unit", "vehicle number"],
+                    driverName: ["driver name", "driver", "cardholder name"]
                 }
             },
             fuelman: {
@@ -1290,8 +1290,19 @@
         function detectFuelCardFormat(content, headers) {
             const lowerContent = content.toLowerCase();
             const lowerHeaders = headers.map(h => h.toLowerCase());
+            const headerStr = lowerHeaders.join(' ');
 
+            // WEX-specific detection (check first - has unique column names)
+            const wexIndicators = ["merchant state", "price per gallon", "prompted odometer", "vehicle name", "transaction date (gmt)"];
+            const wexMatches = wexIndicators.filter(ind => headerStr.includes(ind)).length;
+            if (wexMatches >= 2 || lowerContent.includes('wex') || lowerContent.includes('wright express')) {
+                return 'wex';
+            }
+
+            // Check other formats
             for (const [formatId, format] of Object.entries(FUEL_CARD_FORMATS)) {
+                if (formatId === 'wex') continue; // Already checked
+                
                 // Check content patterns
                 for (const pattern of format.patterns) {
                     if (lowerContent.includes(pattern)) {
