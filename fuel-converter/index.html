@@ -1642,7 +1642,7 @@
             URL.revokeObjectURL(url);
         }
 
-        // ============ BALANCEBOOKS INTEGRATION ============
+        // ============ BALANCEBOOKS INTEGRATION (URL hash transfer) ============
         function sendToBalanceBooks() {
             if (processedData.length === 0) {
                 showToast('No data to import. Please convert a file first.', 'error');
@@ -1667,31 +1667,36 @@
                     fuelType: row['Fuel Type'] || 'Diesel',
                     odometer: row.Odometer || '',
                     truckStop: row['Truck Stop'] || detectedFormat || ''
-                }))
+                })),
+                summary: {
+                    gallons: processedData.reduce((s, r) => s + (parseFloat(r.Gallons) || 0), 0),
+                    amount: processedData.reduce((s, r) => s + (parseFloat(r.Total) || 0), 0)
+                }
             };
 
-            // Calculate totals for summary
-            const totals = {
-                gallons: payload.data.reduce((s, r) => s + r.gallons, 0),
-                amount: payload.data.reduce((s, r) => s + r.totalAmount, 0)
-            };
-            payload.summary = totals;
+            // Show confirmation
+            const confirmMsg = `Ready to import ${payload.rowCount} fuel transactions:\n\n` +
+                `• Total Gallons: ${payload.summary.gallons.toFixed(1)}\n` +
+                `• Total Amount: $${payload.summary.amount.toFixed(2)}\n\n` +
+                `Click OK to open BalanceBooks Trucking.`;
+            
+            if (!confirm(confirmMsg)) return;
 
             try {
-                // Store in localStorage for retrieval by main app
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
+                // Encode data for URL transfer (base64) - works across subdomains
+                const jsonStr = JSON.stringify(payload);
+                const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
                 
-                // Show confirmation
-                const confirmMsg = `Ready to import ${payload.rowCount} fuel transactions:\n\n` +
-                    `• Total Gallons: ${totals.gallons.toFixed(1)}\n` +
-                    `• Total Amount: $${totals.amount.toFixed(2)}\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-                
-                if (confirm(confirmMsg)) {
-                    // Open trucking app with import flag
-                    window.open('https://trucking.balancebooksapp.com/fuel?import=tools', '_blank');
-                    showToast('Data sent! Check the BalanceBooks tab.', 'success');
+                // Check if data is too large for URL (limit ~32KB)
+                if (encoded.length > 32000) {
+                    alert('Dataset is too large for direct import.\n\nPlease use "Download CSV" and import manually.');
+                    return;
                 }
+                
+                // Open trucking app with data in URL hash
+                window.open('https://trucking.balancebooksapp.com/?import=tools#data=' + encoded, '_blank');
+                showToast('Data sent! Check the BalanceBooks tab.', 'success');
+                
             } catch (e) {
                 console.error('Integration error:', e);
                 showToast('Could not prepare data. Try downloading CSV instead.', 'error');
