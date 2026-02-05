@@ -794,10 +794,26 @@
             text-decoration: underline;
         }
 
-        .footer-links {
+        .tools-nav {
             display: flex;
             justify-content: center;
-            gap: 24px;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tools-nav a {
+            color: var(--navy-300);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tools-nav a:hover {
+            color: white;
+            background: var(--navy-700);
         }
 
         /* Responsive */
@@ -946,7 +962,7 @@
                             <span>📁</span> Choose File
                         </button>
                         <div class="supported-formats">
-                            <p>Supported formats: <code>.csv</code> <code>.txt</code> <code>.xls</code> <code>.xlsx</code></p>
+                            <p>Supported formats: <code>.csv</code> <code>.txt</code></p>
                         </div>
                     </div>
                 </section>
@@ -1051,11 +1067,15 @@
 
     <footer>
         <div class="container">
-            <p>Free tool by <a href="https://balancebooksapp.com">BalanceBooks</a> • Your data never leaves your browser</p>
-            <div class="footer-links">
-                <a href="https://trucking.balancebooksapp.com">Trucking App</a>
-                <a href="https://app.balancebooksapp.com">Personal Finance</a>
+            <div class="tools-nav">
+                <a href="/">All Tools</a>
+                <a href="/ifta-calculator">IFTA Calculator</a>
+                <a href="/load-calculator">Load Calculator</a>
+                <a href="/cost-per-mile">Cost Per Mile</a>
+                <a href="/deadhead-calculator">Deadhead Calculator</a>
+                <a href="/per-diem">Per Diem</a>
             </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
         </div>
     </footer>
 
@@ -1806,6 +1826,11 @@
                 showToast(`${fmt.icon} ${fmt.name} selected — upload your file to get started`, 'success');
             }
         })();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>

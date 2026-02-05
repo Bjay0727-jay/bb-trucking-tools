@@ -720,10 +720,12 @@
     <footer>
         <div class="container">
             <div class="tools-nav">
-                <a href="/fuel-converter">⛽ Fuel Converter</a>
-                <a href="/ifta-calculator">📊 IFTA Calculator</a>
-                <a href="/load-calculator">💰 Load Calculator</a>
-                <a href="/deadhead-calculator">🛣️ Deadhead Calculator</a>
+                <a href="/">All Tools</a>
+                <a href="/fuel-converter">Fuel Converter</a>
+                <a href="/ifta-calculator">IFTA Calculator</a>
+                <a href="/cost-per-mile">Cost Per Mile</a>
+                <a href="/deadhead-calculator">Deadhead Calculator</a>
+                <a href="/per-diem">Per Diem</a>
             </div>
             <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
         </div>
@@ -897,7 +899,11 @@
                     `Click OK to open BalanceBooks Trucking.`;
                 
                 if (confirm(msg)) {
-                    window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
+                    if (typeof BB_INTEGRATION !== 'undefined') {
+                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/loads?import=tools');
+                    } else {
+                        window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
+                    }
                 }
             } catch (e) {
                 console.error('Integration error:', e);
@@ -907,6 +913,11 @@
 
         // Initial calculation
         calculate();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
