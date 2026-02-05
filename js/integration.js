@@ -34,14 +34,14 @@ const BB_INTEGRATION = {
                 : `${this.TRUCKING_APP}?import=tools`;
             
             if (silent) {
-                window.open(url, '_blank');
+                this._openWithFallback(url);
                 return true;
             }
-            
+
             // Show confirmation with summary
             const summary = this.getSummary(payload);
             if (confirm(`${summary}\n\nClick OK to open BalanceBooks Trucking.`)) {
-                window.open(url, '_blank');
+                this._openWithFallback(url);
                 return true;
             }
             return false;
@@ -119,6 +119,19 @@ const BB_INTEGRATION = {
             return data ? JSON.parse(data) : null;
         } catch {
             return null;
+        }
+    },
+
+    /**
+     * Open URL with popup-block fallback
+     */
+    _openWithFallback: function(url) {
+        const win = window.open(url, '_blank');
+        if (!win || win.closed) {
+            // Popup was blocked — fall back to navigation
+            if (confirm('Popup blocked by your browser.\n\nClick OK to navigate to BalanceBooks in this tab.')) {
+                window.location.href = url;
+            }
         }
     }
 };

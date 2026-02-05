@@ -573,7 +573,7 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="/fuel-converter" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">📊</div>
                     <div class="logo-text">Balance<span>Books</span></div>
                     <span class="logo-badge">Tools</span>
@@ -689,6 +689,7 @@
         </div>
     </footer>
 
+    <script src="/js/integration.js"></script>
     <script>
         // 2024/2025 IFTA Tax Rates (diesel) - cents per gallon
         const STATE_TAX_RATES = {
@@ -904,8 +905,8 @@
             let totalTaxOwed = 0;
 
             Object.keys(STATE_TAX_RATES).forEach(abbr => {
-                const milesInput = document.querySelector(`input[data-state="${abbr}"][data-field="miles"]`);
-                const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-field="gallons"]`);
+                const milesInput = document.querySelector(`input[data-state="${abbr}"][data-type="miles"]`);
+                const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-type="gallons"]`);
                 
                 if (milesInput && gallonsInput) {
                     const miles = parseFloat(milesInput.value) || 0;
@@ -913,8 +914,8 @@
                     
                     if (miles > 0 || gallons > 0) {
                         const state = STATE_TAX_RATES[abbr];
-                        const mpg = totalMiles > 0 && totalGallons > 0 ? totalMiles / totalGallons : 6.5;
-                        const taxableGallons = miles / mpg;
+                        const mpgValue = parseFloat(document.getElementById('avgMpg').value) || 6.5;
+                        const taxableGallons = miles / mpgValue;
                         const taxOwed = (taxableGallons - gallons) * state.rate;
                         
                         stateData.push({
@@ -939,12 +940,20 @@
                 return;
             }
 
+            // Recalculate state data with correct MPG from input
+            const avgMpg = parseFloat(document.getElementById('avgMpg').value) || 6.5;
+            stateData.forEach(s => {
+                s.taxableGallons = s.miles / avgMpg;
+                s.taxOwed = (s.taxableGallons - s.gallons) * s.taxRate;
+            });
+            totalTaxOwed = stateData.reduce((sum, s) => sum + s.taxOwed, 0);
+
             // Prepare payload
             const payload = {
                 source: 'ifta-calculator',
                 version: '1.0',
                 timestamp: new Date().toISOString(),
-                quarter: getCurrentQuarter(),
+                quarter: getSelectedQuarter(),
                 year: new Date().getFullYear(),
                 states: stateData,
                 summary: {
@@ -973,6 +982,11 @@
                 console.error('Integration error:', e);
                 alert('Could not prepare data. Please try the PDF export instead.');
             }
+        }
+
+        function getSelectedQuarter() {
+            const activeBtn = document.querySelector('.quarter-btn.active');
+            return activeBtn ? activeBtn.dataset.q : getCurrentQuarter();
         }
 
         function getCurrentQuarter() {

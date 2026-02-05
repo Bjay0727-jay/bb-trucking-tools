@@ -870,7 +870,7 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="https://balancebooksapp.com" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">⛽</div>
                     <div class="logo-text">Balance<span>Books</span></div>
                     <span class="logo-badge">Tools</span>
@@ -1046,7 +1046,15 @@
         <span id="toastMessage">Success!</span>
     </div>
 
+    <script src="/js/integration.js"></script>
     <script>
+        // ============ UTILITIES ============
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
         // ============ FUEL CARD FORMAT DEFINITIONS ============
         const FUEL_CARD_FORMATS = {
             loves: {
@@ -1263,7 +1271,7 @@
             );
 
             // Update UI
-            document.getElementById('fileName').textContent = fileName;
+            document.getElementById('fileName').textContent = fileName; // textContent is safe
             document.getElementById('fileStats').textContent = `${rawData.length} rows • ${headers.length} columns`;
 
             // Detect format
@@ -1338,7 +1346,7 @@
                     </label>
                     <select id="map_${field.id}" data-field="${field.id}">
                         <option value="">-- Skip this field --</option>
-                        ${headers.map((h, i) => `<option value="${i}">${h || `Column ${i + 1}`}</option>`).join('')}
+                        ${headers.map((h, i) => `<option value="${i}">${escapeHtml(h) || `Column ${i + 1}`}</option>`).join('')}
                     </select>
                     <div class="mapping-hint">${field.hint}</div>
                 </div>
@@ -1587,7 +1595,7 @@
                             cls = 'gallons';
                             val = parseFloat(val).toFixed(2);
                         }
-                        return `<td class="${cls}">${val}</td>`;
+                        return `<td class="${cls}">${escapeHtml(String(val))}</td>`;
                     }).join('')}
                 </tr>
             `).join('');
@@ -1609,12 +1617,17 @@
             
             // Build CSV
             const csvHeaders = displayFields.map(f => f.name);
-            const csvRows = processedData.map(row => 
+            const csvRows = processedData.map(row =>
                 displayFields.map(f => {
                     let val = row[f.id] || '';
-                    // Quote strings with commas
-                    if (typeof val === 'string' && val.includes(',')) {
-                        val = `"${val}"`;
+                    val = String(val);
+                    // Prevent CSV injection: strip leading formula chars
+                    if (/^[=+\-@\t\r]/.test(val)) {
+                        val = "'" + val;
+                    }
+                    // Quote strings with commas or quotes
+                    if (val.includes(',') || val.includes('"')) {
+                        val = `"${val.replace(/"/g, '""')}"`;
                     }
                     return val;
                 })
@@ -1704,7 +1717,7 @@
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Encode data for URL transfer (base64) - works across subdomains
+                // Encode data for URL-safe transport (base64 encoding, NOT encryption)
                 const jsonStr = JSON.stringify(payload);
                 const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
                 
@@ -1773,6 +1786,17 @@
 
         // Initialize
         goToStep(1);
+
+        // Auto-detect provider from URL parameter (from SEO landing pages)
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const provider = params.get('provider');
+            if (provider && FUEL_CARD_FORMATS[provider]) {
+                detectedFormat = provider;
+                const fmt = FUEL_CARD_FORMATS[provider];
+                showToast(`${fmt.icon} ${fmt.name} selected — upload your file to get started`, 'success');
+            }
+        })();
     </script>
 </body>
 </html>
