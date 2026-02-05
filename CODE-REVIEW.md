@@ -444,19 +444,29 @@ The `$69/day` rate is noted as "2024-2025 IRS DOT Rate." IRS rates change annual
 
 ---
 
-## Priority Summary
+## Priority Summary — Status
 
-| Priority | Issue | Impact |
+| Priority | Issue | Status |
 |----------|-------|--------|
-| **P0 - Fix Now** | IFTA `sendToBalanceBooks()` broken (wrong data attribute) | Integration completely non-functional |
-| **P0 - Fix Now** | XSS via innerHTML in fuel converter | Security vulnerability |
-| **P1 - Fix Soon** | IFTA MPG uses running totals (wrong calculation) | Incorrect tax amounts |
-| **P1 - Fix Soon** | Quarter selector ignored in export | Wrong quarter sent to app |
-| **P1 - Fix Soon** | PWA icons missing (install failures) | Broken PWA |
-| **P1 - Fix Soon** | `js/integration.js` is dead code | Confusing for developers |
-| **P2 - Plan For** | CSS/JS duplication across 15 files | Maintainability |
-| **P2 - Plan For** | Inconsistent integration patterns | Reliability |
-| **P2 - Plan For** | Accessibility gaps | Usability for disabled users |
-| **P3 - Nice to Have** | SEO structured data | Search visibility |
-| **P3 - Nice to Have** | Service worker for offline | PWA completeness |
-| **P3 - Nice to Have** | GitHub Actions CI/CD | Deployment automation |
+| **P0** | IFTA `sendToBalanceBooks()` broken (wrong data attribute) | FIXED |
+| **P0** | XSS via innerHTML in fuel converter | FIXED |
+| **P1** | IFTA MPG uses running totals (wrong calculation) | FIXED |
+| **P1** | Quarter selector ignored in export | FIXED |
+| **P1** | PWA icons missing (install failures) | FIXED — 8 PNG sizes generated |
+| **P1** | `js/integration.js` is dead code | FIXED — loaded by all 4 tools |
+| **P2** | Inconsistent integration patterns | FIXED — all tools use localStorage + BB_INTEGRATION |
+| **P2** | Accessibility gaps | FIXED — focus-visible, skip nav, sr-only |
+| **P2** | .xls/.xlsx parsed as garbled text | FIXED — rejected with clear error |
+| **P2** | Footer nav inconsistent | FIXED — all tools link to all others |
+| **P2** | Header nav inconsistent (logo targets) | FIXED — all logos link to / |
+| **P2** | Open Graph meta tags missing | FIXED — og:title/desc/url/type on all tools |
+| **P2** | Fuel converter ignores ?provider= param | FIXED — auto-detects from SEO pages |
+| **P3** | Service worker for offline | FIXED — sw.js with network-first strategy |
+| **P3** | GitHub Actions CI/CD | FIXED — .github/workflows/deploy.yml |
+| **P3** | netlify.toml dead CSS cache rule | FIXED — replaced with JS/HTML/SW rules |
+| | | |
+| **Remaining** | CSS/JS duplication across 15 files | OPEN — requires build system (Eleventy etc.) |
+| **Remaining** | SEO structured data (Schema.org) | OPEN |
+| **Remaining** | Shortcut icons (fuel-96.png etc.) | OPEN |
+| **Remaining** | 404.html page | OPEN |
+| **Remaining** | Per Diem / IFTA rate maintenance strategy | OPEN |
