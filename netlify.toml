@@ -27,6 +27,11 @@
     Cache-Control = "public, max-age=86400"
 
 [[headers]]
+  for = "/styles/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
   for = "/manifest.json"
   [headers.values]
     Cache-Control = "public, max-age=86400"
@@ -114,8 +119,8 @@
   to = "/ta-petro-converter/index.html"
   status = 200
 
-# SPA fallback
+# 404 page
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/404.html"
   status = 404

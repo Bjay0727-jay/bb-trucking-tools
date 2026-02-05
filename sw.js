@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bb-tools-v1';
+const CACHE_NAME = 'bb-tools-v2';
 const ASSETS = [
     '/',
     '/fuel-converter/',
@@ -7,6 +7,7 @@ const ASSETS = [
     '/cost-per-mile/',
     '/deadhead-calculator/',
     '/per-diem/',
+    '/styles/shared.css',
     '/js/integration.js',
     '/icons/icon-192.png',
     '/icons/icon-512.png',
@@ -53,7 +54,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Static assets: cache first, fall back to network
-    if (url.pathname.match(/\.(js|png|svg|json)$/)) {
+    if (url.pathname.match(/\.(js|css|png|svg|json)$/)) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;

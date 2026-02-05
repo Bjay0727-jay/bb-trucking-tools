@@ -465,8 +465,8 @@ The `$69/day` rate is noted as "2024-2025 IRS DOT Rate." IRS rates change annual
 | **P3** | GitHub Actions CI/CD | FIXED — .github/workflows/deploy.yml |
 | **P3** | netlify.toml dead CSS cache rule | FIXED — replaced with JS/HTML/SW rules |
 | | | |
-| **Remaining** | CSS/JS duplication across 15 files | OPEN — requires build system (Eleventy etc.) |
-| **Remaining** | SEO structured data (Schema.org) | OPEN |
-| **Remaining** | Shortcut icons (fuel-96.png etc.) | OPEN |
-| **Remaining** | 404.html page | OPEN |
-| **Remaining** | Per Diem / IFTA rate maintenance strategy | OPEN |
+| **P3** | CSS duplication across tool pages | FIXED — shared.css extracted, inline CSS trimmed to page-specific overrides |
+| **P3** | SEO structured data (Schema.org) | FIXED — JSON-LD WebApplication on all 6 tool pages + WebSite on index |
+| **P3** | Shortcut icons (fuel-96.png etc.) | FIXED — fuel-96, ifta-96, load-96 generated |
+| **P3** | 404.html page | FIXED — custom 404 with tool links, netlify.toml updated |
+| **P3** | Per Diem / IFTA rate maintenance strategy | FIXED — data/rates.json with metadata + review dates |
