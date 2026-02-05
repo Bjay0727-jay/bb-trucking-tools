@@ -6,6 +6,10 @@
     <title>Free Per Diem Calculator | Trucker Tax Deduction | BalanceBooks</title>
     <meta name="description" content="Free per diem calculator for truckers. Calculate your meal deduction using 2024-2025 IRS rates. Track days away from home and maximize your tax savings.">
     <meta name="keywords" content="per diem calculator, trucker per diem, meal deduction, IRS per diem rate, owner operator taxes, trucker tax deduction">
+    <meta property="og:title" content="Free Per Diem Calculator | BalanceBooks">
+    <meta property="og:description" content="Free per diem calculator for truckers. Calculate your meal deduction using IRS rates. Track days away from home and maximize tax savings.">
+    <meta property="og:url" content="https://tools.balancebooksapp.com/per-diem">
+    <meta property="og:type" content="website">
     <link rel="canonical" href="https://tools.balancebooksapp.com/per-diem">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +31,23 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :focus-visible {
+            outline: 2px solid var(--orange-500);
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -399,6 +420,8 @@
     </style>
 </head>
 <body>
+    <a href="#main" class="sr-only">Skip to main content</a>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -410,7 +433,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main">
         <div class="container">
             <section class="hero">
                 <h1><span>Per Diem</span> Calculator</h1>

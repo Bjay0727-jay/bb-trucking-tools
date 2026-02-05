@@ -41,6 +41,23 @@
             box-sizing: border-box;
         }
 
+        :focus-visible {
+            outline: 2px solid var(--orange-500);
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
@@ -866,6 +883,7 @@
 </head>
 <body>
     <div class="bg-pattern"></div>
+    <a href="#main" class="sr-only">Skip to main content</a>
 
     <header>
         <div class="container">
@@ -883,7 +901,7 @@
         </div>
     </header>
 
-    <main>
+    <main id="main">
         <div class="container">
             <section class="hero">
                 <h1>Fuel Card <span>CSV Converter</span></h1>
@@ -920,7 +938,7 @@
                 <!-- Step 1: Upload -->
                 <section class="upload-section" id="step1">
                     <div class="upload-zone" id="uploadZone">
-                        <input type="file" id="fileInput" accept=".csv,.txt,.xls,.xlsx">
+                        <input type="file" id="fileInput" accept=".csv,.txt">
                         <div class="upload-icon">📤</div>
                         <h3>Drop your fuel card CSV here</h3>
                         <p>or click to browse files</p>
@@ -1227,13 +1245,7 @@
                 };
                 reader.readAsText(file);
             } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
-                showToast('Excel files are parsed as CSV. For best results, save as CSV first.', 'error');
-                // Try to parse anyway
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    parseCSV(e.target.result, file.name);
-                };
-                reader.readAsText(file);
+                showToast('Excel files (.xls/.xlsx) are not supported. Please open the file in Excel and Save As CSV first.', 'error');
             } else {
                 showToast('Please upload a CSV file', 'error');
             }
@@ -1717,20 +1729,17 @@
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Encode data for URL-safe transport (base64 encoding, NOT encryption)
-                const jsonStr = JSON.stringify(payload);
-                const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-                
-                // Check if data is too large for URL (limit ~32KB)
-                if (encoded.length > 32000) {
-                    alert('Dataset is too large for direct import.\n\nPlease use "Download CSV" and import manually.');
-                    return;
+                // Use localStorage for cross-domain transfer (consistent with other tools)
+                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
+
+                // Open trucking app with import flag
+                if (typeof BB_INTEGRATION !== 'undefined') {
+                    BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/fuel?import=tools');
+                } else {
+                    window.open('https://trucking.balancebooksapp.com/fuel?import=tools', '_blank');
                 }
-                
-                // Open trucking app with data in URL hash
-                window.open('https://trucking.balancebooksapp.com/?import=tools#data=' + encoded, '_blank');
                 showToast('Data sent! Check the BalanceBooks tab.', 'success');
-                
+
             } catch (e) {
                 console.error('Integration error:', e);
                 showToast('Could not prepare data. Try downloading CSV instead.', 'error');
