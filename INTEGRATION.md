@@ -1,625 +1,325 @@
-# BalanceBooks Tools ↔ Main App Integration Configuration
+# BalanceBooks Tools → Trucking App Integration
 
-Complete integration guide for connecting the free tools suite with BalanceBooks for Trucking.
+Cross-origin data transfer from `tools.balancebooksapp.com` to `trucking.balancebooksapp.com`.
 
 ---
 
-## 🔗 Integration Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     FREE TOOLS SUITE                             │
+│                     FREE TOOLS SUITE                            │
 │              tools.balancebooksapp.com                          │
-│                                                                  │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
-│  │  Fuel    │ │  IFTA    │ │  Load    │ │  Cost    │           │
-│  │Converter │ │Calculator│ │Calculator│ │ Per Mile │           │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘           │
-│       │            │            │            │                   │
-│       └────────────┴─────┬──────┴────────────┘                   │
-│                          │                                       │
-│                    [Export Data]                                 │
-│                          │                                       │
-└──────────────────────────┼───────────────────────────────────────┘
+│                                                                 │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐          │
+│  │  Fuel    │ │  IFTA    │ │  Load    │ │  Cost    │          │
+│  │Converter │ │Calculator│ │Calculator│ │ Per Mile │          │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘          │
+│       │            │            │            │                  │
+│  ┌────┴─────┐ ┌────┴─────┐     │            │                  │
+│  │  Per     │ │ Deadhead │     │            │                  │
+│  │  Diem   │ │Calculator│     │            │                  │
+│  └────┬─────┘ └────┬─────┘     │            │                  │
+│       │            │            │            │                  │
+│       └────────────┴─────┬──────┴────────────┘                  │
+│                          │                                      │
+│              BB_INTEGRATION.sendToApp()                         │
+│                          │                                      │
+└──────────────────────────┼──────────────────────────────────────┘
                            │
-            ┌──────────────┴──────────────┐
-            │   URL Parameters + Storage   │
-            │   postMessage API            │
-            └──────────────┬──────────────┘
+             ┌─────────────┴──────────────┐
+             │  postMessage (cross-origin) │
+             │  URL hash fallback (#bbdata)│
+             └─────────────┬──────────────┘
                            │
-┌──────────────────────────┼───────────────────────────────────────┐
-│                          │                                       │
+┌──────────────────────────┼──────────────────────────────────────┐
+│                          │                                      │
 │              BALANCEBOOKS TRUCKING APP                          │
 │              trucking.balancebooksapp.com                       │
-│                          │                                       │
-│  ┌──────────┐ ┌─────────▼────┐ ┌──────────┐ ┌──────────┐       │
-│  │  Fuel    │ │   Import     │ │  IFTA    │ │   Load   │       │
-│  │   Log    │ │   Handler    │ │ Reports  │ │  Tracker │       │
-│  └──────────┘ └──────────────┘ └──────────┘ └──────────┘       │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+│                          │                                      │
+│              BB_INTEGRATION.listenForImport()                   │
+│                          │                                      │
+│  ┌──────────┐ ┌─────────▼────┐ ┌──────────┐ ┌──────────┐      │
+│  │  Fuel    │ │   Import     │ │  IFTA    │ │   Load   │      │
+│  │   Log    │ │   Handler    │ │ Reports  │ │  Tracker │      │
+│  └──────────┘ └──────────────┘ └──────────┘ └──────────┘      │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📤 Data Export from Tools
+## How It Works
 
-### 1. Fuel Card Converter → Fuel Log
+1. User clicks **"Send to BalanceBooks"** on any tool page
+2. Tool builds a structured JSON payload and calls `BB_INTEGRATION.sendToApp(payload, route)`
+3. Confirmation dialog shows a summary of data being sent
+4. **Primary path:** Opens trucking app in a new tab, sends payload via `window.postMessage` with origin validation. Retries every 500ms until the trucking app acknowledges (max 30s).
+5. **Fallback path:** If popup is blocked, encodes payload in URL hash (`#bbdata=...`) and navigates in the same tab.
+6. Trucking app calls `BB_INTEGRATION.listenForImport(callback)` to receive data via either method.
 
-Add this to `/fuel-converter/index.html` after the export buttons:
+### Why not localStorage?
+
+`localStorage` is per-origin. `tools.balancebooksapp.com` and `trucking.balancebooksapp.com` are different origins, so they cannot share `localStorage`. `postMessage` is the standard cross-origin browser communication API.
+
+---
+
+## Shared Library: `js/integration.js` (v2.0)
+
+Both apps can include this file. It provides:
+
+### Sender API (used by tools site)
+
+```js
+BB_INTEGRATION.sendToApp(payload, route, silent)
+```
+
+- `payload` — Object with `source` key identifying the tool
+- `route` — Trucking app route: `fuel`, `ifta`, `loads`, `settings`, `expenses`
+- `silent` — If `true`, skips the confirmation dialog
+
+### Receiver API (used by trucking app)
+
+```js
+BB_INTEGRATION.listenForImport(function(payload) {
+    // payload.source tells you which tool sent the data
+    console.log(payload.source, payload);
+});
+```
+
+Handles both `postMessage` (popup) and URL hash (same-tab fallback). Sends an acknowledgment back to the sender to stop retries.
+
+---
+
+## Payload Reference
+
+### Fuel Converter → `/fuel`
+
+```json
+{
+    "source": "fuel-converter",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "provider": "loves",
+    "rowCount": 45,
+    "data": [
+        {
+            "date": "2025-01-10",
+            "location": "Love's #301",
+            "city": "Dallas",
+            "state": "TX",
+            "gallons": 120.5,
+            "pricePerGallon": 3.45,
+            "totalAmount": 415.73,
+            "fuelType": "Diesel",
+            "odometer": "234567",
+            "truckStop": "loves"
+        }
+    ],
+    "summary": {
+        "gallons": 1250.5,
+        "amount": 4312.50
+    }
+}
+```
+
+### IFTA Calculator → `/ifta`
+
+```json
+{
+    "source": "ifta-calculator",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "quarter": "Q1",
+    "year": 2025,
+    "states": [
+        { "abbr": "TX", "miles": 2500, "gallons": 400 },
+        { "abbr": "OK", "miles": 800, "gallons": 130 }
+    ],
+    "summary": {
+        "totalMiles": 3300,
+        "totalGallons": 530,
+        "mpg": 6.5,
+        "totalTaxOwed": "42.15",
+        "statesWithActivity": 2
+    }
+}
+```
+
+### Load Calculator → `/loads`
+
+```json
+{
+    "source": "load-calculator",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "load": {
+        "lineHaul": 3200,
+        "fuelSurcharge": 250,
+        "loadedMiles": 1200,
+        "deadheadMiles": 75,
+        "fuelPrice": 3.50,
+        "mpg": 6.5,
+        "costPerMile": 0.45,
+        "dispatchFee": 320,
+        "grossRevenue": 3450,
+        "netProfit": 1850,
+        "rpmGross": 2.71,
+        "rpmNet": 1.45,
+        "profitMargin": 53.6,
+        "verdict": "Good Load"
+    }
+}
+```
+
+### Cost Per Mile → `/settings`
+
+```json
+{
+    "source": "cost-per-mile",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "settings": {
+        "monthlyMiles": 10000,
+        "fixedCosts": {
+            "truckPayment": 1800,
+            "insurance": 800,
+            "permits": 150,
+            "eld": 35,
+            "parking": 200
+        },
+        "variableCosts": {
+            "fuel": 5385,
+            "maintenance": 500,
+            "tires": 200,
+            "def": 50,
+            "tolls": 150
+        },
+        "calculated": {
+            "fixedTotal": 2985,
+            "variableTotal": 6285,
+            "totalMonthly": 9270,
+            "totalCPM": 0.927,
+            "fixedCPM": 0.2985,
+            "variableCPM": 0.6285,
+            "breakEvenRate": 0.927,
+            "recommendedRate20": 1.159,
+            "recommendedRate30": 1.324
+        }
+    }
+}
+```
+
+### Per Diem → `/expenses`
+
+```json
+{
+    "source": "per-diem",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "perDiem": {
+        "dailyRate": 69,
+        "fullDays": 250,
+        "partialDays": 24,
+        "fullDaysAmount": 17250,
+        "partialDaysAmount": 1242,
+        "totalDeduction": 18492,
+        "deductibleAmount": 14793.6,
+        "taxBracket": 0.22,
+        "stateRate": 0.05,
+        "savings": {
+            "federal": 3254.59,
+            "state": 739.68,
+            "selfEmployment": 2263.42,
+            "total": 6257.69
+        }
+    }
+}
+```
+
+### Deadhead Calculator → `/loads`
+
+```json
+{
+    "source": "deadhead-calculator",
+    "version": "2.0",
+    "timestamp": "2025-01-15T10:30:00.000Z",
+    "deadhead": {
+        "miles": 150,
+        "fuelPrice": 3.50,
+        "mpg": 6.5,
+        "otherCostsPerMile": 0.35,
+        "hourlyRate": 25,
+        "gallonsUsed": 23.1,
+        "hours": 2.7,
+        "costs": {
+            "fuel": 80.77,
+            "operating": 52.50,
+            "time": 68.18,
+            "total": 201.45
+        },
+        "minLoadRate": 201.45
+    }
+}
+```
+
+---
+
+## Implementing the Receiver (Trucking App)
+
+### 1. Include `integration.js`
+
+Copy `js/integration.js` into the trucking app, or load it from the tools CDN:
 
 ```html
-<!-- Import to App Button -->
-<button id="importToApp" class="btn btn-primary" onclick="sendToBalanceBooks()">
-    🚀 Import to BalanceBooks
-</button>
-
-<script>
-function sendToBalanceBooks() {
-    // Get converted data
-    const data = getConvertedData(); // Your existing function
-    
-    if (!data || data.length === 0) {
-        alert('Please convert a file first');
-        return;
-    }
-    
-    // Prepare payload
-    const payload = {
-        source: 'fuel-converter',
-        version: '1.0',
-        timestamp: new Date().toISOString(),
-        provider: detectedProvider, // e.g., 'loves', 'pilot'
-        data: data.map(row => ({
-            date: row.date,
-            location: row.location,
-            city: row.city,
-            state: row.state,
-            gallons: parseFloat(row.gallons),
-            pricePerGallon: parseFloat(row.ppg),
-            totalAmount: parseFloat(row.total),
-            fuelType: row.fuelType || 'diesel',
-            odometerStart: row.odometerStart || null,
-            odometerEnd: row.odometerEnd || null,
-            truckStop: row.truckStop || detectedProvider
-        }))
-    };
-    
-    // Store in localStorage for cross-domain transfer
-    try {
-        localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-    } catch (e) {
-        console.warn('localStorage not available');
-    }
-    
-    // Encode for URL (fallback)
-    const encoded = btoa(JSON.stringify(payload));
-    
-    // Open app with import flag
-    const appUrl = `https://trucking.balancebooksapp.com/fuel?import=tools&data=${encoded.substring(0, 2000)}`;
-    
-    // Try postMessage first (if app is already open)
-    if (window.opener) {
-        window.opener.postMessage({ type: 'BB_TOOLS_IMPORT', payload }, 'https://app.balancebooksapp.com');
-        alert('Data sent to BalanceBooks!');
-    } else {
-        window.open(appUrl, '_blank');
-    }
-}
-</script>
+<script src="https://tools.balancebooksapp.com/js/integration.js"></script>
 ```
 
-### 2. IFTA Calculator → IFTA Reports
+### 2. Listen for imports
 
-Add to `/ifta-calculator/index.html`:
+Call once on app startup:
 
-```html
-<button id="exportToIFTA" class="btn btn-primary" onclick="sendIFTAToApp()">
-    📊 Send to IFTA Report
-</button>
-
-<script>
-function sendIFTAToApp() {
-    const iftaData = getIFTAData(); // Your existing calculation
-    
-    const payload = {
-        source: 'ifta-calculator',
-        version: '1.0',
-        timestamp: new Date().toISOString(),
-        quarter: document.getElementById('quarter')?.value || 'Q1',
-        year: document.getElementById('year')?.value || new Date().getFullYear(),
-        states: iftaData.map(state => ({
-            state: state.abbr,
-            miles: state.miles,
-            gallons: state.gallons,
-            taxRate: state.taxRate,
-            taxableGallons: state.taxableGallons,
-            taxOwed: state.taxOwed
-        })),
-        summary: {
-            totalMiles: iftaData.reduce((s, st) => s + st.miles, 0),
-            totalGallons: iftaData.reduce((s, st) => s + st.gallons, 0),
-            totalTaxOwed: iftaData.reduce((s, st) => s + st.taxOwed, 0),
-            mpg: calculateMPG()
-        }
-    };
-    
-    localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-    window.open('https://trucking.balancebooksapp.com/ifta?import=tools', '_blank');
-}
-</script>
-```
-
-### 3. Load Calculator → Load Tracker
-
-Add to `/load-calculator/index.html`:
-
-```html
-<button id="saveLoad" class="btn btn-primary" onclick="saveLoadToApp()">
-    💾 Save to Load Tracker
-</button>
-
-<script>
-function saveLoadToApp() {
-    const loadData = {
-        source: 'load-calculator',
-        version: '1.0',
-        timestamp: new Date().toISOString(),
-        load: {
-            lineHaul: parseFloat(document.getElementById('lineHaul').value),
-            fuelSurcharge: parseFloat(document.getElementById('fuelSurcharge').value) || 0,
-            loadedMiles: parseFloat(document.getElementById('loadedMiles').value),
-            deadheadMiles: parseFloat(document.getElementById('deadheadMiles').value) || 0,
-            dispatchFee: parseFloat(document.getElementById('dispatchFee').value) || 0,
-            fuelCost: calculatedFuelCost,
-            netProfit: calculatedNetProfit,
-            rpmGross: calculatedRPMGross,
-            rpmNet: calculatedRPMNet,
-            profitMargin: calculatedMargin,
-            verdict: getVerdict() // 'good', 'marginal', 'poor', 'losing'
-        }
-    };
-    
-    localStorage.setItem('bb_tools_export', JSON.stringify(loadData));
-    window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
-}
-</script>
-```
-
-### 4. Cost Per Mile → Settings/Dashboard
-
-Add to `/cost-per-mile/index.html`:
-
-```html
-<button id="syncCPM" class="btn btn-primary" onclick="syncCPMToApp()">
-    🔄 Sync to BalanceBooks
-</button>
-
-<script>
-function syncCPMToApp() {
-    const cpmData = {
-        source: 'cost-per-mile',
-        version: '1.0',
-        timestamp: new Date().toISOString(),
-        settings: {
-            monthlyMiles: parseFloat(document.getElementById('monthlyMiles').value),
-            fixedCosts: {
-                truckPayment: parseFloat(getInputValue('truck-payment')),
-                insurance: parseFloat(getInputValue('insurance')),
-                permits: parseFloat(getInputValue('permits')),
-                eld: parseFloat(getInputValue('eld')),
-                parking: parseFloat(getInputValue('parking'))
-            },
-            variableCosts: {
-                fuel: parseFloat(getInputValue('fuel')),
-                maintenance: parseFloat(getInputValue('maintenance')),
-                tires: parseFloat(getInputValue('tires')),
-                def: parseFloat(getInputValue('def')),
-                misc: parseFloat(getInputValue('misc'))
-            },
-            calculated: {
-                totalCPM: calculatedTotalCPM,
-                fixedCPM: calculatedFixedCPM,
-                variableCPM: calculatedVariableCPM,
-                breakEvenRate: calculatedBreakEven
-            }
-        }
-    };
-    
-    localStorage.setItem('bb_tools_export', JSON.stringify(cpmData));
-    window.open('https://trucking.balancebooksapp.com/settings?import=cpm', '_blank');
-}
-</script>
-```
-
----
-
-## 📥 Import Handler for Main App
-
-Add this to your main BalanceBooks Trucking app (`App.jsx` or equivalent):
-
-### Import Detection Hook
-
-```jsx
-// hooks/useToolsImport.js
-import { useState, useEffect } from 'react';
-
-export function useToolsImport() {
-    const [importData, setImportData] = useState(null);
-    const [showImportModal, setShowImportModal] = useState(false);
-
-    useEffect(() => {
-        // Check URL parameters
-        const params = new URLSearchParams(window.location.search);
-        const importFlag = params.get('import');
-        
-        if (importFlag === 'tools') {
-            // Try localStorage first
-            const stored = localStorage.getItem('bb_tools_export');
-            if (stored) {
-                try {
-                    const data = JSON.parse(stored);
-                    setImportData(data);
-                    setShowImportModal(true);
-                    // Clear after reading
-                    localStorage.removeItem('bb_tools_export');
-                } catch (e) {
-                    console.error('Failed to parse import data', e);
-                }
-            }
-            
-            // Try URL data (fallback for large datasets)
-            const urlData = params.get('data');
-            if (urlData && !stored) {
-                try {
-                    const decoded = JSON.parse(atob(urlData));
-                    setImportData(decoded);
-                    setShowImportModal(true);
-                } catch (e) {
-                    console.error('Failed to decode URL data', e);
-                }
-            }
-            
-            // Clean URL
-            window.history.replaceState({}, '', window.location.pathname);
-        }
-
-        // Listen for postMessage from tools
-        const handleMessage = (event) => {
-            if (event.origin !== 'https://tools.balancebooksapp.com') return;
-            if (event.data?.type === 'BB_TOOLS_IMPORT') {
-                setImportData(event.data.payload);
-                setShowImportModal(true);
-            }
-        };
-        
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
-    }, []);
-
-    const confirmImport = (handler) => {
-        if (importData && handler) {
-            handler(importData);
-        }
-        setShowImportModal(false);
-        setImportData(null);
-    };
-
-    const cancelImport = () => {
-        setShowImportModal(false);
-        setImportData(null);
-    };
-
-    return { importData, showImportModal, confirmImport, cancelImport };
-}
-```
-
-### Import Modal Component
-
-```jsx
-// components/ToolsImportModal.jsx
-import React from 'react';
-
-export function ToolsImportModal({ data, onConfirm, onCancel }) {
-    if (!data) return null;
-
-    const getSourceInfo = () => {
-        switch (data.source) {
-            case 'fuel-converter':
-                return {
-                    icon: '⛽',
-                    title: 'Fuel Card Import',
-                    description: `${data.data?.length || 0} fuel transactions from ${data.provider || 'Unknown'}`,
-                    action: 'Import to Fuel Log'
-                };
-            case 'ifta-calculator':
-                return {
-                    icon: '📊',
-                    title: 'IFTA Data Import',
-                    description: `${data.quarter} ${data.year} - ${data.states?.length || 0} states`,
-                    action: 'Import to IFTA Report'
-                };
-            case 'load-calculator':
-                return {
-                    icon: '💰',
-                    title: 'Load Data Import',
-                    description: `Load: $${data.load?.lineHaul || 0} line haul, ${data.load?.loadedMiles || 0} miles`,
-                    action: 'Save to Load Tracker'
-                };
-            case 'cost-per-mile':
-                return {
-                    icon: '🛣️',
-                    title: 'Cost Per Mile Settings',
-                    description: `CPM: $${data.settings?.calculated?.totalCPM?.toFixed(2) || '0.00'}/mi`,
-                    action: 'Update Settings'
-                };
-            default:
-                return {
-                    icon: '📤',
-                    title: 'Data Import',
-                    description: 'Import data from BalanceBooks Tools',
-                    action: 'Import'
-                };
-        }
-    };
-
-    const info = getSourceInfo();
-
-    return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
-                    <div className="flex items-center gap-4">
-                        <div className="text-4xl">{info.icon}</div>
-                        <div>
-                            <h2 className="text-xl font-bold">{info.title}</h2>
-                            <p className="text-orange-100 text-sm">From BalanceBooks Tools</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                    <div className="bg-slate-50 rounded-xl p-4 mb-4">
-                        <p className="text-slate-700">{info.description}</p>
-                        <p className="text-xs text-slate-400 mt-2">
-                            Imported: {new Date(data.timestamp).toLocaleString()}
-                        </p>
-                    </div>
-
-                    {/* Preview for fuel data */}
-                    {data.source === 'fuel-converter' && data.data?.length > 0 && (
-                        <div className="mb-4">
-                            <p className="text-sm font-medium text-slate-600 mb-2">Preview:</p>
-                            <div className="max-h-32 overflow-y-auto text-sm">
-                                {data.data.slice(0, 3).map((row, i) => (
-                                    <div key={i} className="flex justify-between py-1 border-b border-slate-100">
-                                        <span>{row.date} - {row.location}</span>
-                                        <span className="font-mono">{row.gallons} gal</span>
-                                    </div>
-                                ))}
-                                {data.data.length > 3 && (
-                                    <p className="text-slate-400 text-xs mt-1">
-                                        +{data.data.length - 3} more transactions
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onCancel}
-                            className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={onConfirm}
-                            className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl"
-                        >
-                            {info.action}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-```
-
-### Integration in Main App Component
-
-```jsx
-// In your main App.jsx or trucking dashboard
-import { useToolsImport } from './hooks/useToolsImport';
-import { ToolsImportModal } from './components/ToolsImportModal';
-
-function TruckingApp() {
-    const { importData, showImportModal, confirmImport, cancelImport } = useToolsImport();
-    
-    // Existing state
-    const [fuelLog, setFuelLog] = useState([]);
-    const [loads, setLoads] = useState([]);
-    const [settings, setSettings] = useState({});
-
-    // Import handlers by source
-    const handleImport = () => {
-        if (!importData) return;
-
-        switch (importData.source) {
-            case 'fuel-converter':
-                // Add fuel transactions
-                const newFuelEntries = importData.data.map(row => ({
-                    id: generateId(),
-                    ...row,
-                    importedFrom: 'tools',
-                    importedAt: new Date().toISOString()
-                }));
-                setFuelLog(prev => [...prev, ...newFuelEntries]);
-                showToast(`Imported ${newFuelEntries.length} fuel transactions!`);
-                break;
-
-            case 'ifta-calculator':
-                // Navigate to IFTA section with pre-filled data
-                setIFTADraft(importData);
-                navigate('/trucking/ifta/new');
-                break;
-
-            case 'load-calculator':
-                // Add load to tracker
-                const newLoad = {
-                    id: generateId(),
-                    ...importData.load,
-                    status: 'quoted',
-                    importedFrom: 'tools',
-                    importedAt: new Date().toISOString()
-                };
-                setLoads(prev => [...prev, newLoad]);
-                showToast('Load saved to tracker!');
-                break;
-
-            case 'cost-per-mile':
-                // Update settings
-                setSettings(prev => ({
-                    ...prev,
-                    costPerMile: importData.settings.calculated.totalCPM,
-                    monthlyMiles: importData.settings.monthlyMiles,
-                    expenses: {
-                        fixed: importData.settings.fixedCosts,
-                        variable: importData.settings.variableCosts
-                    }
-                }));
-                showToast('Cost per mile settings updated!');
-                break;
-        }
-    };
-
-    return (
-        <div>
-            {/* Your existing app UI */}
-            
-            {/* Import Modal */}
-            {showImportModal && (
-                <ToolsImportModal
-                    data={importData}
-                    onConfirm={() => confirmImport(handleImport)}
-                    onCancel={cancelImport}
-                />
-            )}
-        </div>
-    );
-}
-```
-
----
-
-## 🔘 Quick Import Buttons for App UI
-
-Add these buttons throughout your trucking app:
-
-```jsx
-// components/ToolsButtons.jsx
-
-export function ImportFromToolsButton({ tool, label }) {
-    const toolUrls = {
-        'fuel': 'https://tools.balancebooksapp.com/fuel-converter',
-        'ifta': 'https://tools.balancebooksapp.com/ifta-calculator',
-        'load': 'https://tools.balancebooksapp.com/load-calculator',
-        'cpm': 'https://tools.balancebooksapp.com/cost-per-mile',
-        'deadhead': 'https://tools.balancebooksapp.com/deadhead-calculator',
-        'perdiem': 'https://tools.balancebooksapp.com/per-diem'
-    };
-
-    return (
-        <button
-            onClick={() => window.open(toolUrls[tool], '_blank')}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm"
-        >
-            📤 {label || 'Import from Tools'}
-        </button>
-    );
-}
-
-// Usage examples:
-// <ImportFromToolsButton tool="fuel" label="Import Fuel Card" />
-// <ImportFromToolsButton tool="ifta" label="Use IFTA Calculator" />
-// <ImportFromToolsButton tool="load" label="Calculate Load Profit" />
-```
-
----
-
-## 🎨 UI Integration Points
-
-### Fuel Log Section
-```jsx
-<div className="flex items-center justify-between mb-4">
-    <h2>Fuel Log</h2>
-    <div className="flex gap-2">
-        <ImportFromToolsButton tool="fuel" label="Import Fuel Card" />
-        <button onClick={addManualEntry}>+ Add Entry</button>
-    </div>
-</div>
-```
-
-### IFTA Reports Section
-```jsx
-<div className="flex items-center justify-between mb-4">
-    <h2>IFTA Reports</h2>
-    <ImportFromToolsButton tool="ifta" label="Use Calculator" />
-</div>
-```
-
-### Load Tracker Section
-```jsx
-<div className="flex items-center justify-between mb-4">
-    <h2>Loads</h2>
-    <ImportFromToolsButton tool="load" label="Calculate Profit" />
-</div>
-```
-
-### Settings/Dashboard
-```jsx
-<div className="card">
-    <h3>Operating Costs</h3>
-    <p>Current CPM: ${settings.costPerMile?.toFixed(2) || '0.00'}/mi</p>
-    <ImportFromToolsButton tool="cpm" label="Update from Calculator" />
-</div>
-```
-
----
-
-## 🔒 Security Considerations
-
-```javascript
-// Validate import data
-function validateImportData(data) {
-    // Check source
-    const validSources = ['fuel-converter', 'ifta-calculator', 'load-calculator', 'cost-per-mile'];
-    if (!validSources.includes(data.source)) {
-        throw new Error('Invalid import source');
-    }
-
-    // Check timestamp (reject data older than 1 hour)
-    const importTime = new Date(data.timestamp);
-    const now = new Date();
-    const hourAgo = new Date(now - 60 * 60 * 1000);
-    if (importTime < hourAgo) {
-        throw new Error('Import data expired');
-    }
-
-    // Validate data structure based on source
-    switch (data.source) {
+```js
+BB_INTEGRATION.listenForImport(function(payload) {
+    switch (payload.source) {
         case 'fuel-converter':
-            if (!Array.isArray(data.data)) throw new Error('Invalid fuel data');
-            data.data.forEach(row => {
-                if (typeof row.gallons !== 'number') throw new Error('Invalid gallons');
-                if (typeof row.totalAmount !== 'number') throw new Error('Invalid amount');
-            });
+            importFuelTransactions(payload.data, payload.summary);
             break;
-        // Add validation for other sources...
+        case 'ifta-calculator':
+            importIFTAData(payload.quarter, payload.year, payload.states, payload.summary);
+            break;
+        case 'load-calculator':
+            importLoad(payload.load);
+            break;
+        case 'cost-per-mile':
+            updateCPMSettings(payload.settings);
+            break;
+        case 'per-diem':
+            importPerDiem(payload.perDiem);
+            break;
+        case 'deadhead-calculator':
+            importDeadhead(payload.deadhead);
+            break;
+    }
+});
+```
+
+### 3. Validate incoming data
+
+```js
+function validateImportData(data) {
+    var validSources = [
+        'fuel-converter', 'ifta-calculator', 'load-calculator',
+        'cost-per-mile', 'per-diem', 'deadhead-calculator'
+    ];
+    if (!validSources.includes(data.source)) {
+        throw new Error('Invalid import source: ' + data.source);
+    }
+
+    // Reject data older than 1 hour
+    var importTime = new Date(data.timestamp);
+    if (Date.now() - importTime.getTime() > 3600000) {
+        throw new Error('Import data expired');
     }
 
     return true;
@@ -628,68 +328,26 @@ function validateImportData(data) {
 
 ---
 
-## 📊 Analytics Events
+## Security
 
-Track tool-to-app conversion:
-
-```javascript
-// In tools (on export)
-gtag('event', 'tools_export', {
-    'tool': 'fuel-converter',
-    'provider': 'loves',
-    'rows': data.length,
-    'destination': 'main_app'
-});
-
-// In main app (on import)
-gtag('event', 'tools_import', {
-    'source': importData.source,
-    'items': importData.data?.length || 1,
-    'success': true
-});
-```
+- **Origin validation:** `listenForImport()` only accepts `postMessage` events from `https://tools.balancebooksapp.com`
+- **No eval/innerHTML:** Payloads are plain JSON objects, never injected as HTML
+- **Timestamp expiry:** Receiver should reject payloads older than 1 hour
+- **Source whitelist:** Receiver should validate `payload.source` against known tool names
+- **URL hash cleanup:** Hash data is removed from the URL bar via `history.replaceState` after reading
 
 ---
 
-## 🧪 Testing Checklist
+## Testing Checklist
 
-- [ ] Fuel converter → Fuel log import
-- [ ] IFTA calculator → IFTA reports import
-- [ ] Load calculator → Load tracker import  
-- [ ] Cost per mile → Settings update
-- [ ] LocalStorage transfer works
-- [ ] URL parameter fallback works
-- [ ] postMessage works (same tab scenario)
-- [ ] Import modal displays correctly
-- [ ] Data validation rejects invalid imports
-- [ ] Analytics events fire correctly
-
----
-
-## 📱 Mobile Deep Linking (Optional)
-
-For mobile app integration:
-
-```javascript
-// Check if native app is installed
-function openInApp(path, data) {
-    const appScheme = 'balancebooks://';
-    const webUrl = `https://app.balancebooksapp.com${path}`;
-    
-    // Try app scheme first
-    const appUrl = `${appScheme}trucking${path}?import=tools`;
-    
-    // Store data for retrieval
-    localStorage.setItem('bb_tools_export', JSON.stringify(data));
-    
-    // Try to open app, fall back to web
-    const start = Date.now();
-    window.location.href = appUrl;
-    
-    setTimeout(() => {
-        if (Date.now() - start < 2000) {
-            window.location.href = webUrl;
-        }
-    }, 1500);
-}
-```
+- [ ] Fuel converter → `/fuel` import
+- [ ] IFTA calculator → `/ifta` import
+- [ ] Load calculator → `/loads` import
+- [ ] Cost per mile → `/settings` import
+- [ ] Per diem → `/expenses` import
+- [ ] Deadhead calculator → `/loads` import
+- [ ] postMessage transfer works across subdomains
+- [ ] URL hash fallback works when popup blocked
+- [ ] Acknowledgment stops retry interval
+- [ ] Data validation rejects invalid/expired imports
+- [ ] Confirmation dialog shows correct summary per tool
