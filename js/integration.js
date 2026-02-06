@@ -84,7 +84,19 @@ const BB_INTEGRATION = {
                     `• Total CPM: $${cpm.toFixed(2)}/mi\n` +
                     `• Monthly Costs: $${payload.settings?.calculated?.totalMonthly?.toLocaleString() || 0}\n` +
                     `• Recommended Rate: $${(cpm / 0.80).toFixed(2)}/mi`;
-                    
+
+            case 'per-diem':
+                return `Send per diem data to BalanceBooks?\n\n` +
+                    `• Days: ${payload.perDiem?.fullDays || 0} full + ${payload.perDiem?.partialDays || 0} partial\n` +
+                    `• Total Deduction: $${payload.perDiem?.totalDeduction?.toLocaleString() || 0}\n` +
+                    `• Tax Savings: $${payload.perDiem?.savings?.total?.toLocaleString(undefined, {maximumFractionDigits: 0}) || 0}`;
+
+            case 'deadhead-calculator':
+                return `Send deadhead data to BalanceBooks?\n\n` +
+                    `• Empty Miles: ${payload.deadhead?.miles || 0}\n` +
+                    `• Total Cost: $${payload.deadhead?.costs?.total?.toFixed(2) || 0}\n` +
+                    `• Min Load Rate: $${payload.deadhead?.minLoadRate?.toFixed(2) || 0}`;
+
             default:
                 return `Ready to send data to BalanceBooks.`;
         }
