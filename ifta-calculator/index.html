@@ -643,22 +643,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-                
-                const msg = `Ready to import IFTA data:\n\n` +
-                    `• States: ${stateData.length}\n` +
-                    `• Total Miles: ${totalMiles.toLocaleString()}\n` +
-                    `• Total Gallons: ${totalGallons.toLocaleString()}\n` +
-                    `• Net Tax: $${totalTaxOwed.toFixed(2)}\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-                
-                if (confirm(msg)) {
-                    if (typeof BB_INTEGRATION !== 'undefined') {
-                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/ifta?import=tools');
-                    } else {
-                        window.open('https://trucking.balancebooksapp.com/ifta?import=tools', '_blank');
-                    }
-                }
+                BB_INTEGRATION.sendToApp(payload, 'ifta');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not prepare data. Please try the PDF export instead.');

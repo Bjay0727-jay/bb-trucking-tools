@@ -518,21 +518,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-                
-                const msg = `Save this load to BalanceBooks?\n\n` +
-                    `• Line Haul: $${payload.load.lineHaul.toLocaleString()}\n` +
-                    `• Miles: ${payload.load.loadedMiles + payload.load.deadheadMiles} total\n` +
-                    `• Verdict: ${payload.load.verdict}\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-                
-                if (confirm(msg)) {
-                    if (typeof BB_INTEGRATION !== 'undefined') {
-                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/loads?import=tools');
-                    } else {
-                        window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
-                    }
-                }
+                BB_INTEGRATION.sendToApp(payload, 'loads');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not save load data. Please try again.');

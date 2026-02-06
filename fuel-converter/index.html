@@ -1127,19 +1127,11 @@
                 `• Total Gallons: ${payload.summary.gallons.toFixed(1)}\n` +
                 `• Total Amount: $${payload.summary.amount.toFixed(2)}\n\n` +
                 `Click OK to open BalanceBooks Trucking.`;
-            
+
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Use localStorage for cross-domain transfer (consistent with other tools)
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-
-                // Open trucking app with import flag
-                if (typeof BB_INTEGRATION !== 'undefined') {
-                    BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/fuel?import=tools');
-                } else {
-                    window.open('https://trucking.balancebooksapp.com/fuel?import=tools', '_blank');
-                }
+                BB_INTEGRATION.sendToApp(payload, 'fuel', true);
                 showToast('Data sent! Check the BalanceBooks tab.', 'success');
 
             } catch (e) {

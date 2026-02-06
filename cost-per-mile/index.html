@@ -491,22 +491,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-                
-                const msg = `Sync cost-per-mile settings to BalanceBooks?\n\n` +
-                    `• Total CPM: $${totalCPM.toFixed(2)}/mi\n` +
-                    `• Monthly Costs: $${(fixedTotal + variableTotal).toLocaleString()}\n` +
-                    `• Break-even Rate: $${totalCPM.toFixed(2)}/mi\n` +
-                    `• Recommended (20% profit): $${(totalCPM / 0.80).toFixed(2)}/mi\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-                
-                if (confirm(msg)) {
-                    if (typeof BB_INTEGRATION !== 'undefined') {
-                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/settings?import=tools');
-                    } else {
-                        window.open('https://trucking.balancebooksapp.com/settings?import=tools', '_blank');
-                    }
-                }
+                BB_INTEGRATION.sendToApp(payload, 'settings');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not sync settings. Please try again.');

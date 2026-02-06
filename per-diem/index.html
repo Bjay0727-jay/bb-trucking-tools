@@ -362,21 +362,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-
-                const msg = `Send per diem data to BalanceBooks?\n\n` +
-                    `• Days: ${fullDays} full + ${partialDays} partial\n` +
-                    `• Total Deduction: $${totalDeduction.toLocaleString()}\n` +
-                    `• Tax Savings: $${payload.perDiem.savings.total.toLocaleString(undefined, {maximumFractionDigits: 0})}\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-
-                if (confirm(msg)) {
-                    if (typeof BB_INTEGRATION !== 'undefined') {
-                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/expenses?import=tools');
-                    } else {
-                        window.open('https://trucking.balancebooksapp.com/expenses?import=tools', '_blank');
-                    }
-                }
+                BB_INTEGRATION.sendToApp(payload, 'expenses');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not prepare data. Please try again.');

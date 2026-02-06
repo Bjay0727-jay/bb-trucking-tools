@@ -321,21 +321,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-
-                const msg = `Send deadhead data to BalanceBooks?\n\n` +
-                    `• Empty Miles: ${deadheadMiles}\n` +
-                    `• Total Cost: $${totalCost.toFixed(2)}\n` +
-                    `• Min Load Rate Needed: $${totalCost.toFixed(2)}\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-
-                if (confirm(msg)) {
-                    if (typeof BB_INTEGRATION !== 'undefined') {
-                        BB_INTEGRATION._openWithFallback('https://trucking.balancebooksapp.com/loads?import=tools');
-                    } else {
-                        window.open('https://trucking.balancebooksapp.com/loads?import=tools', '_blank');
-                    }
-                }
+                BB_INTEGRATION.sendToApp(payload, 'loads');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not prepare data. Please try again.');
