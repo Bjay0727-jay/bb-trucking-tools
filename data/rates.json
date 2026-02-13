@@ -1,0 +1,50 @@
+{
+    "_meta": {
+        "description": "Tax rates and per diem data used by BalanceBooks trucking tools. Update this file when IRS or state rates change.",
+        "lastUpdated": "2025-01-15",
+        "nextReviewDate": "2025-10-01",
+        "maintainer": "BalanceBooks team",
+        "sources": {
+            "perDiem": "IRS Notice 2024-68 (or current year equivalent)",
+            "iftaRates": "IFTA Inc — https://www.iftach.org/taxmatrix/"
+        }
+    },
+    "perDiem": {
+        "effectiveYear": "2024-2025",
+        "dailyRate": 69,
+        "partialDayPercent": 75,
+        "dotDeductionPercent": 80,
+        "selfEmploymentTaxRate": 15.3,
+        "notes": "DOT transportation workers can deduct 80% of per diem (vs 50% for others). Rate is $69/day for tax year 2024-2025."
+    },
+    "iftaRates": {
+        "effectiveQuarter": "2025-Q1",
+        "notes": "IFTA fuel tax rates by state (cents per gallon for diesel). Update quarterly from IFTA tax rate matrix.",
+        "diesel": {
+            "AL": 0.29, "AK": 0.0895, "AZ": 0.26, "AR": 0.285,
+            "CA": 0.6817, "CO": 0.205, "CT": 0.4490, "DE": 0.22,
+            "FL": 0.35, "GA": 0.329, "HI": 0.16, "ID": 0.32,
+            "IL": 0.467, "IN": 0.56, "IA": 0.325, "KS": 0.26,
+            "KY": 0.246, "LA": 0.20, "ME": 0.312, "MD": 0.3675,
+            "MA": 0.24, "MI": 0.267, "MN": 0.285, "MS": 0.18,
+            "MO": 0.195, "MT": 0.2975, "NE": 0.281, "NV": 0.27,
+            "NH": 0.222, "NJ": 0.485, "NM": 0.21, "NY": 0.3015,
+            "NC": 0.382, "ND": 0.23, "OH": 0.47, "OK": 0.19,
+            "OR": 0.38, "PA": 0.741, "RI": 0.35, "SC": 0.28,
+            "SD": 0.28, "TN": 0.27, "TX": 0.20, "UT": 0.315,
+            "VT": 0.31, "VA": 0.296, "WA": 0.494, "WV": 0.352,
+            "WI": 0.329, "WY": 0.24
+        }
+    },
+    "federalTaxBrackets": {
+        "effectiveYear": "2024",
+        "single": [
+            { "min": 0, "max": 11600, "rate": 10 },
+            { "min": 11601, "max": 47150, "rate": 12 },
+            { "min": 47151, "max": 100525, "rate": 22 },
+            { "min": 100526, "max": 191950, "rate": 24 },
+            { "min": 191951, "max": 243725, "rate": 32 },
+            { "min": 243726, "max": null, "rate": 35 }
+        ]
+    }
+}

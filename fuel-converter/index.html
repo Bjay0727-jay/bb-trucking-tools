@@ -5,872 +5,288 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuel Card Converter | BalanceBooks Tools</title>
     <meta name="description" content="Free tool to convert fuel card statements from Comdata, EFS, WEX, Fuelman, TCS, Loves, and Pilot into BalanceBooks format.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Fuel Card CSV Converter",
+        "url": "https://tools.balancebooksapp.com/fuel-converter",
+        "description": "Free tool to convert fuel card statements from Comdata, EFS, WEX, Fuelman, TCS, Loves, and Pilot into BalanceBooks format.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "BalanceBooks", "url": "https://balancebooksapp.com" }
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="/styles/shared.css">
     <style>
+        /* Fuel Converter — page-specific overrides */
         :root {
-            --navy-900: #0a1628;
-            --navy-800: #0f172a;
-            --navy-700: #1e293b;
-            --navy-600: #334155;
-            --navy-500: #475569;
-            --navy-400: #64748b;
-            --navy-300: #94a3b8;
-            --navy-200: #cbd5e1;
-            --navy-100: #e2e8f0;
             --navy-50: #f8fafc;
-            --orange-500: #f97316;
-            --orange-400: #fb923c;
-            --orange-600: #ea580c;
             --orange-100: #ffedd5;
-            --teal-500: #14b8a6;
-            --teal-400: #2dd4bf;
-            --green-500: #22c55e;
-            --green-100: #dcfce7;
-            --red-500: #ef4444;
-            --red-100: #fee2e2;
-            --yellow-500: #eab308;
             --yellow-100: #fef9c3;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
-            color: var(--navy-100);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Animated background */
+        .container { max-width: 1200px; }
         .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
+            background-image:
                 radial-gradient(ellipse at 20% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.06) 0%, transparent 50%),
                 url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l9.9-9.9h-2.83zM32 0l-3.486 3.485L30 5l3.486-3.485L32 0zm10.142 0L32 10.142l1.414 1.414L45.556 0h-3.414zM0 5.373l.828-.83 1.415 1.415L0 8.2V5.374zm0 5.656l.828-.829 5.657 5.657-1.414 1.414L0 11.03v-.001zm0 5.656l.828-.828 8.485 8.485-1.414 1.414L0 16.686v-.001zm0 5.657l.828-.828 11.314 11.314-1.414 1.414L0 22.343v-.001zM0 28l.828-.828L15.314 41.657l-1.414 1.414L0 28.001V28zm0 5.657l.828-.828 17.142 17.142-1.414 1.414L0 33.657v-.001zm0 5.656l.828-.828 19.97 19.97-1.414 1.415L0 39.314v-.001zM0 45l.828-.829L23.8 67.143l-1.415 1.414L0 45.001V45zm60 9.627l-.828.83-1.415-1.415L60 51.8v2.827zm0-5.656l-.828.829-5.657-5.657 1.414-1.414L60 48.97v-.001zm0-5.656l-.828.828-8.485-8.485 1.414-1.414L60 43.314v-.001zm0-5.657l-.828.828-11.314-11.314 1.414-1.414L60 37.657v-.001zM60 32l-.828.828L44.686 18.343l1.414-1.414L60 31.999V32zm0-5.657l-.828.828-17.142-17.142 1.414-1.414L60 26.343v-.001zm0-5.656l-.828.828-19.97-19.97 1.414-1.415L60 20.686v-.001zM60 15l-.828.829L36.2-7.143l1.415-1.414L60 14.999V15z' fill='rgba(255,255,255,0.015)' fill-rule='evenodd'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        header {
-            padding: 24px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: inherit;
-        }
-
         .logo-icon {
-            width: 44px;
-            height: 44px;
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .logo-text span {
-            color: var(--orange-400);
-        }
-
         .logo-badge {
-            background: var(--navy-700);
             color: var(--orange-400);
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
             border: 1px solid var(--navy-600);
         }
-
-        .header-links {
-            display: flex;
-            gap: 8px;
-        }
-
-        .header-link {
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .header-link.secondary {
-            color: var(--navy-300);
-            background: transparent;
-        }
-
-        .header-link.secondary:hover {
-            color: white;
-            background: var(--navy-700);
-        }
-
-        .header-link.primary {
-            color: var(--navy-900);
-            background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
-        }
-
+        .header-link.secondary { color: var(--navy-300); background: transparent; }
+        .header-link.secondary:hover { color: white; background: var(--navy-700); }
         .header-link.primary:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
 
-        /* Hero */
-        .hero {
-            text-align: center;
-            padding: 64px 0 48px;
-        }
-
-        .hero h1 {
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 800;
-            color: white;
-            margin-bottom: 16px;
-            line-height: 1.2;
-        }
-
+        /* Hero overrides */
+        .hero { padding: 64px 0 48px; }
+        .hero h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.2; margin-bottom: 16px; }
         .hero h1 span {
             background: linear-gradient(135deg, var(--orange-400) 0%, var(--orange-500) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        .hero p { font-size: 18px; max-width: 600px; margin: 0 auto 32px; }
 
-        .hero p {
-            font-size: 18px;
-            color: var(--navy-300);
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-
-        /* Supported Cards */
-        .supported-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 48px;
-        }
-
+        /* Supported cards badges */
+        .supported-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 48px; }
         .card-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
             padding: 10px 16px;
-            background: var(--navy-700);
-            border: 1px solid var(--navy-600);
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--navy-200);
-            transition: all 0.2s;
+            background: var(--navy-700); border: 1px solid var(--navy-600);
+            border-radius: 100px; font-size: 13px; font-weight: 600;
+            color: var(--navy-200); transition: all 0.2s;
         }
+        .card-badge:hover { border-color: var(--orange-500); background: var(--navy-600); }
+        .card-badge .icon { font-size: 16px; }
 
-        .card-badge:hover {
-            border-color: var(--orange-500);
-            background: var(--navy-600);
-        }
+        /* App container override */
+        .app-container { margin-bottom: 64px; }
 
-        .card-badge .icon {
-            font-size: 16px;
-        }
-
-        /* Main App */
-        .app-container {
-            background: var(--navy-800);
-            border: 1px solid var(--navy-600);
-            border-radius: 24px;
-            overflow: hidden;
-            margin-bottom: 64px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Steps Indicator */
-        .steps-indicator {
-            display: flex;
-            background: var(--navy-900);
-            border-bottom: 1px solid var(--navy-700);
-        }
-
+        /* Steps indicator */
+        .steps-indicator { display: flex; background: var(--navy-900); border-bottom: 1px solid var(--navy-700); }
         .step-item {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--navy-400);
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            gap: 12px; padding: 20px; font-size: 14px; font-weight: 600;
+            color: var(--navy-400); border-bottom: 3px solid transparent; transition: all 0.2s;
         }
-
-        .step-item.active {
-            color: var(--orange-400);
-            border-bottom-color: var(--orange-500);
-            background: rgba(249, 115, 22, 0.05);
-        }
-
-        .step-item.completed {
-            color: var(--green-500);
-        }
-
+        .step-item.active { color: var(--orange-400); border-bottom-color: var(--orange-500); background: rgba(249, 115, 22, 0.05); }
+        .step-item.completed { color: var(--green-500); }
         .step-number {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--navy-700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--navy-700); display: flex; align-items: center;
+            justify-content: center; font-size: 12px; font-weight: 700;
         }
+        .step-item.active .step-number { background: var(--orange-500); color: white; }
+        .step-item.completed .step-number { background: var(--green-500); color: white; }
 
-        .step-item.active .step-number {
-            background: var(--orange-500);
-            color: white;
-        }
-
-        .step-item.completed .step-number {
-            background: var(--green-500);
-            color: white;
-        }
-
-        /* Upload Zone */
-        .upload-section {
-            padding: 48px;
-        }
-
+        /* Upload zone */
+        .upload-section { padding: 48px; }
         .upload-zone {
-            border: 2px dashed var(--navy-500);
-            border-radius: 20px;
-            padding: 64px 32px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            background: var(--navy-900);
+            border: 2px dashed var(--navy-500); border-radius: 20px;
+            padding: 64px 32px; text-align: center; transition: all 0.3s;
+            cursor: pointer; background: var(--navy-900);
         }
-
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--orange-500);
-            background: rgba(249, 115, 22, 0.05);
-        }
-
-        .upload-zone.dragover {
-            transform: scale(1.01);
-        }
-
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--orange-500); background: rgba(249, 115, 22, 0.05); }
+        .upload-zone.dragover { transform: scale(1.01); }
         .upload-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
+            width: 80px; height: 80px; margin: 0 auto 24px;
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
+            border-radius: 20px; display: flex; align-items: center;
+            justify-content: center; font-size: 36px;
             box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
         }
-
-        .upload-zone h3 {
-            font-size: 22px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .upload-zone p {
-            color: var(--navy-400);
-            margin-bottom: 24px;
-        }
-
-        .upload-zone input[type="file"] {
-            display: none;
-        }
-
+        .upload-zone h3 { font-size: 22px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .upload-zone p { color: var(--navy-400); margin-bottom: 24px; }
+        .upload-zone input[type="file"] { display: none; }
         .upload-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: inline-flex; align-items: center; gap: 8px;
             padding: 14px 28px;
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
+            color: white; border: none; border-radius: 12px; font-size: 15px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
         }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
-        }
-
-        .supported-formats {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--navy-700);
-        }
-
-        .supported-formats p {
-            font-size: 13px;
-            color: var(--navy-400);
-        }
-
+        .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); }
+        .supported-formats { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--navy-700); }
+        .supported-formats p { font-size: 13px; color: var(--navy-400); }
         .supported-formats code {
-            background: var(--navy-700);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--orange-400);
+            background: var(--navy-700); padding: 2px 8px; border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--orange-400);
         }
 
-        /* Mapping Section */
-        .mapping-section {
-            padding: 32px 48px 48px;
-            display: none;
-        }
-
-        .mapping-section.active {
-            display: block;
-        }
-
+        /* Mapping section */
+        .mapping-section { padding: 32px 48px 48px; display: none; }
+        .mapping-section.active { display: block; }
         .file-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 20px;
-            background: var(--navy-900);
-            border-radius: 12px;
-            margin-bottom: 32px;
-            border: 1px solid var(--navy-700);
+            display: flex; align-items: center; gap: 16px;
+            padding: 20px; background: var(--navy-900); border-radius: 12px;
+            margin-bottom: 32px; border: 1px solid var(--navy-700);
         }
-
-        .file-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--navy-700);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .file-details {
-            flex: 1;
-        }
-
-        .file-details h4 {
-            font-size: 15px;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .file-details p {
-            font-size: 13px;
-            color: var(--navy-400);
-        }
-
+        .file-icon { width: 48px; height: 48px; background: var(--navy-700); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .file-details { flex: 1; }
+        .file-details h4 { font-size: 15px; font-weight: 600; color: white; margin-bottom: 4px; }
+        .file-details p { font-size: 13px; color: var(--navy-400); }
         .detected-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            background: var(--green-100);
-            color: #166534;
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+            background: var(--green-100); color: #166534; border-radius: 100px;
+            font-size: 13px; font-weight: 600;
         }
-
         .remove-file {
-            padding: 10px;
-            background: transparent;
-            border: 1px solid var(--navy-600);
-            border-radius: 10px;
-            color: var(--navy-400);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 16px;
+            padding: 10px; background: transparent; border: 1px solid var(--navy-600);
+            border-radius: 10px; color: var(--navy-400); cursor: pointer; transition: all 0.2s; font-size: 16px;
         }
-
-        .remove-file:hover {
-            background: var(--red-100);
-            border-color: var(--red-500);
-            color: var(--red-500);
-        }
-
-        /* Column Mapping */
+        .remove-file:hover { background: var(--red-100); border-color: var(--red-500); color: var(--red-500); }
         .mapping-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px; margin-bottom: 32px;
         }
-
         .mapping-card {
-            background: var(--navy-900);
-            border: 1px solid var(--navy-700);
-            border-radius: 14px;
-            padding: 20px;
-            transition: all 0.2s;
+            background: var(--navy-900); border: 1px solid var(--navy-700);
+            border-radius: 14px; padding: 20px; transition: all 0.2s;
         }
-
-        .mapping-card:hover {
-            border-color: var(--navy-500);
-        }
-
-        .mapping-card.required {
-            border-left: 3px solid var(--orange-500);
-        }
-
+        .mapping-card:hover { border-color: var(--navy-500); }
+        .mapping-card.required { border-left: 3px solid var(--orange-500); }
         .mapping-card label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 600; color: white; margin-bottom: 12px;
         }
-
-        .mapping-card label .icon {
-            font-size: 16px;
-        }
-
-        .required-star {
-            color: var(--orange-500);
-            font-weight: 700;
-        }
-
+        .mapping-card label .icon { font-size: 16px; }
+        .required-star { color: var(--orange-500); font-weight: 700; }
         .mapping-card select {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--navy-800);
-            border: 1px solid var(--navy-600);
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; padding: 12px 16px; background: var(--navy-800);
+            border: 1px solid var(--navy-600); border-radius: 10px; color: white;
+            font-size: 14px; font-family: inherit; cursor: pointer; transition: all 0.2s;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 40px;
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px;
         }
+        .mapping-card select:focus { outline: none; border-color: var(--orange-500); }
+        .mapping-card select option { background: var(--navy-800); color: white; }
+        .mapping-hint { font-size: 12px; color: var(--navy-400); margin-top: 8px; }
 
-        .mapping-card select:focus {
-            outline: none;
-            border-color: var(--orange-500);
-        }
-
-        .mapping-card select option {
-            background: var(--navy-800);
-            color: white;
-        }
-
-        .mapping-hint {
-            font-size: 12px;
-            color: var(--navy-400);
-            margin-top: 8px;
-        }
-
-        /* Preview Section */
-        .preview-section {
-            padding: 32px 48px 48px;
-            display: none;
-        }
-
-        .preview-section.active {
-            display: block;
-        }
-
+        /* Preview section */
+        .preview-section { padding: 32px 48px 48px; display: none; }
+        .preview-section.active { display: block; }
         .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
         }
-
-        .preview-header h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .preview-stats {
-            display: flex;
-            gap: 24px;
-        }
-
-        .preview-stat {
-            text-align: center;
-        }
-
-        .preview-stat .value {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--orange-400);
-        }
-
-        .preview-stat .label {
-            font-size: 12px;
-            color: var(--navy-400);
-        }
-
-        .preview-table-wrapper {
-            overflow-x: auto;
-            border: 1px solid var(--navy-700);
-            border-radius: 12px;
-            margin-bottom: 24px;
-        }
-
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
+        .preview-header h3 { font-size: 20px; font-weight: 700; color: white; }
+        .preview-stats { display: flex; gap: 24px; }
+        .preview-stat { text-align: center; }
+        .preview-stat .value { font-size: 24px; font-weight: 800; color: var(--orange-400); }
+        .preview-stat .label { font-size: 12px; color: var(--navy-400); }
+        .preview-table-wrapper { overflow-x: auto; border: 1px solid var(--navy-700); border-radius: 12px; margin-bottom: 24px; }
+        .preview-table { width: 100%; border-collapse: collapse; font-size: 13px; }
         .preview-table th {
-            background: var(--navy-900);
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--navy-300);
-            border-bottom: 1px solid var(--navy-700);
-            white-space: nowrap;
+            background: var(--navy-900); padding: 14px 16px; text-align: left;
+            font-weight: 600; color: var(--navy-300); border-bottom: 1px solid var(--navy-700); white-space: nowrap;
         }
-
         .preview-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--navy-700);
-            color: var(--navy-200);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            padding: 12px 16px; border-bottom: 1px solid var(--navy-700);
+            color: var(--navy-200); font-family: 'JetBrains Mono', monospace; font-size: 12px;
         }
+        .preview-table tr:last-child td { border-bottom: none; }
+        .preview-table tr:hover td { background: var(--navy-900); }
+        .preview-table .row-number { color: var(--navy-500); font-weight: 500; }
+        .preview-table .currency { color: var(--green-500); font-weight: 500; }
+        .preview-table .gallons { color: var(--teal-400); }
 
-        .preview-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .preview-table tr:hover td {
-            background: var(--navy-900);
-        }
-
-        .preview-table .row-number {
-            color: var(--navy-500);
-            font-weight: 500;
-        }
-
-        .preview-table .currency {
-            color: var(--green-500);
-            font-weight: 500;
-        }
-
-        .preview-table .gallons {
-            color: var(--teal-400);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            padding-top: 24px;
-            border-top: 1px solid var(--navy-700);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            border: none;
-        }
-
-        .btn-secondary {
-            background: var(--navy-700);
-            color: var(--navy-200);
-            border: 1px solid var(--navy-600);
-        }
-
-        .btn-secondary:hover {
-            background: var(--navy-600);
-            color: white;
-        }
-
+        /* Action buttons overrides */
+        .action-buttons { justify-content: space-between; padding-top: 24px; border-top: 1px solid var(--navy-700); }
         .btn-primary {
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
-            color: white;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
-        }
-
+        .btn-primary:hover { box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); }
         .btn-success {
             background: linear-gradient(135deg, var(--green-500) 0%, #16a34a 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
-        }
-
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4); }
         .btn-import {
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
+        .btn-import:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); }
+        .export-options { display: flex; gap: 12px; }
 
-        .btn-import:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-        }
-
-        .export-options {
-            display: flex;
-            gap: 12px;
-        }
-
-        /* Success Screen */
-        .success-section {
-            padding: 64px 48px;
-            text-align: center;
-            display: none;
-        }
-
-        .success-section.active {
-            display: block;
-        }
-
+        /* Success screen */
+        .success-section { padding: 64px 48px; text-align: center; display: none; }
+        .success-section.active { display: block; }
         .success-icon {
-            width: 100px;
-            height: 100px;
+            width: 100px; height: 100px;
             background: linear-gradient(135deg, var(--green-500) 0%, #16a34a 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            margin: 0 auto 24px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 48px; margin: 0 auto 24px;
             animation: successPop 0.5s ease-out;
         }
-
         @keyframes successPop {
             0% { transform: scale(0); opacity: 0; }
             50% { transform: scale(1.2); }
             100% { transform: scale(1); opacity: 1; }
         }
+        .success-section h3 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 12px; }
+        .success-section p { font-size: 16px; color: var(--navy-300); margin-bottom: 32px; }
+        .success-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
 
-        .success-section h3 {
-            font-size: 28px;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 12px;
-        }
+        /* Footer override */
+        footer { padding: 48px 0; }
+        footer p { margin-bottom: 16px; }
+        footer a:hover { text-decoration: underline; }
 
-        .success-section p {
-            font-size: 16px;
-            color: var(--navy-300);
-            margin-bottom: 32px;
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 32px; right: 32px;
+            background: var(--navy-700); border: 1px solid var(--navy-600);
+            color: white; padding: 16px 24px; border-radius: 12px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s ease; z-index: 1000;
         }
-
-        .success-actions {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 48px 0;
-            border-top: 1px solid var(--navy-700);
-        }
-
-        footer p {
-            color: var(--navy-400);
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        footer a {
-            color: var(--orange-400);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { border-left: 4px solid var(--green-500); }
+        .toast.error { border-left: 4px solid var(--red-500); }
+        .toast-icon { font-size: 20px; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .upload-section, .mapping-section, .preview-section, .success-section {
-                padding: 24px;
-            }
-
-            .steps-indicator {
-                overflow-x: auto;
-            }
-
-            .step-item {
-                padding: 16px 12px;
-                font-size: 12px;
-                white-space: nowrap;
-            }
-
-            .step-item span:last-child {
-                display: none;
-            }
-
-            .mapping-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-links {
-                display: none;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .export-options {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 32px;
-            right: 32px;
-            background: var(--navy-700);
-            border: 1px solid var(--navy-600);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            border-left: 4px solid var(--green-500);
-        }
-
-        .toast.error {
-            border-left: 4px solid var(--red-500);
-        }
-
-        .toast-icon {
-            font-size: 20px;
+            .upload-section, .mapping-section, .preview-section, .success-section { padding: 24px; }
+            .steps-indicator { overflow-x: auto; }
+            .step-item { padding: 16px 12px; font-size: 12px; white-space: nowrap; }
+            .step-item span:last-child { display: none; }
+            .mapping-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .export-options { width: 100%; flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
     <div class="bg-pattern"></div>
+    <a href="#main" class="sr-only">Skip to main content</a>
 
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="https://balancebooksapp.com" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">⛽</div>
                     <div class="logo-text">Balance<span>Books</span></div>
                     <span class="logo-badge">Tools</span>
@@ -883,7 +299,18 @@
         </div>
     </header>
 
-    <main>
+    <nav class="tools-sidebar" aria-label="Tools">
+        <div class="tools-sidebar-inner">
+            <a href="/fuel-converter" class="active"><span class="nav-icon">⛽</span><span class="nav-label">Fuel Converter</span></a>
+            <a href="/ifta-calculator"><span class="nav-icon">📊</span><span class="nav-label">IFTA</span></a>
+            <a href="/load-calculator"><span class="nav-icon">💰</span><span class="nav-label">Load Calc</span></a>
+            <a href="/cost-per-mile"><span class="nav-icon">🛣️</span><span class="nav-label">Cost/Mile</span></a>
+            <a href="/deadhead-calculator"><span class="nav-icon">🔄</span><span class="nav-label">Deadhead</span></a>
+            <a href="/per-diem"><span class="nav-icon">📅</span><span class="nav-label">Per Diem</span></a>
+        </div>
+    </nav>
+
+    <main id="main">
         <div class="container">
             <section class="hero">
                 <h1>Fuel Card <span>CSV Converter</span></h1>
@@ -920,7 +347,7 @@
                 <!-- Step 1: Upload -->
                 <section class="upload-section" id="step1">
                     <div class="upload-zone" id="uploadZone">
-                        <input type="file" id="fileInput" accept=".csv,.txt,.xls,.xlsx">
+                        <input type="file" id="fileInput" accept=".csv,.txt">
                         <div class="upload-icon">📤</div>
                         <h3>Drop your fuel card CSV here</h3>
                         <p>or click to browse files</p>
@@ -928,7 +355,7 @@
                             <span>📁</span> Choose File
                         </button>
                         <div class="supported-formats">
-                            <p>Supported formats: <code>.csv</code> <code>.txt</code> <code>.xls</code> <code>.xlsx</code></p>
+                            <p>Supported formats: <code>.csv</code> <code>.txt</code></p>
                         </div>
                     </div>
                 </section>
@@ -1033,11 +460,21 @@
 
     <footer>
         <div class="container">
-            <p>Free tool by <a href="https://balancebooksapp.com">BalanceBooks</a> • Your data never leaves your browser</p>
-            <div class="footer-links">
-                <a href="https://trucking.balancebooksapp.com">Trucking App</a>
-                <a href="https://app.balancebooksapp.com">Personal Finance</a>
+            <div class="footer-brand">
+                <div class="logo-icon">🚛</div>
+                <div class="logo-text">Balance<span>Books</span></div>
             </div>
+            <div class="tools-nav">
+                <a href="/">All Tools</a>
+                <a href="/fuel-converter">Fuel Converter</a>
+                <a href="/ifta-calculator">IFTA Calculator</a>
+                <a href="/load-calculator">Load Calculator</a>
+                <a href="/cost-per-mile">Cost Per Mile</a>
+                <a href="/deadhead-calculator">Deadhead</a>
+                <a href="/per-diem">Per Diem</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a></p>
+            <div class="footer-meta">Data stays in your browser. Nothing is uploaded or stored on any server.</div>
         </div>
     </footer>
 
@@ -1046,7 +483,15 @@
         <span id="toastMessage">Success!</span>
     </div>
 
+    <script src="/js/integration.js"></script>
     <script>
+        // ============ UTILITIES ============
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
         // ============ FUEL CARD FORMAT DEFINITIONS ============
         const FUEL_CARD_FORMATS = {
             loves: {
@@ -1219,13 +664,7 @@
                 };
                 reader.readAsText(file);
             } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
-                showToast('Excel files are parsed as CSV. For best results, save as CSV first.', 'error');
-                // Try to parse anyway
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    parseCSV(e.target.result, file.name);
-                };
-                reader.readAsText(file);
+                showToast('Excel files (.xls/.xlsx) are not supported. Please open the file in Excel and Save As CSV first.', 'error');
             } else {
                 showToast('Please upload a CSV file', 'error');
             }
@@ -1263,7 +702,7 @@
             );
 
             // Update UI
-            document.getElementById('fileName').textContent = fileName;
+            document.getElementById('fileName').textContent = fileName; // textContent is safe
             document.getElementById('fileStats').textContent = `${rawData.length} rows • ${headers.length} columns`;
 
             // Detect format
@@ -1338,7 +777,7 @@
                     </label>
                     <select id="map_${field.id}" data-field="${field.id}">
                         <option value="">-- Skip this field --</option>
-                        ${headers.map((h, i) => `<option value="${i}">${h || `Column ${i + 1}`}</option>`).join('')}
+                        ${headers.map((h, i) => `<option value="${i}">${escapeHtml(h) || `Column ${i + 1}`}</option>`).join('')}
                     </select>
                     <div class="mapping-hint">${field.hint}</div>
                 </div>
@@ -1587,7 +1026,7 @@
                             cls = 'gallons';
                             val = parseFloat(val).toFixed(2);
                         }
-                        return `<td class="${cls}">${val}</td>`;
+                        return `<td class="${cls}">${escapeHtml(String(val))}</td>`;
                     }).join('')}
                 </tr>
             `).join('');
@@ -1609,12 +1048,17 @@
             
             // Build CSV
             const csvHeaders = displayFields.map(f => f.name);
-            const csvRows = processedData.map(row => 
+            const csvRows = processedData.map(row =>
                 displayFields.map(f => {
                     let val = row[f.id] || '';
-                    // Quote strings with commas
-                    if (typeof val === 'string' && val.includes(',')) {
-                        val = `"${val}"`;
+                    val = String(val);
+                    // Prevent CSV injection: strip leading formula chars
+                    if (/^[=+\-@\t\r]/.test(val)) {
+                        val = "'" + val;
+                    }
+                    // Quote strings with commas or quotes
+                    if (val.includes(',') || val.includes('"')) {
+                        val = `"${val.replace(/"/g, '""')}"`;
                     }
                     return val;
                 })
@@ -1700,24 +1144,13 @@
                 `• Total Gallons: ${payload.summary.gallons.toFixed(1)}\n` +
                 `• Total Amount: $${payload.summary.amount.toFixed(2)}\n\n` +
                 `Click OK to open BalanceBooks Trucking.`;
-            
+
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Encode data for URL transfer (base64) - works across subdomains
-                const jsonStr = JSON.stringify(payload);
-                const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-                
-                // Check if data is too large for URL (limit ~32KB)
-                if (encoded.length > 32000) {
-                    alert('Dataset is too large for direct import.\n\nPlease use "Download CSV" and import manually.');
-                    return;
-                }
-                
-                // Open trucking app with data in URL hash
-                window.open('https://trucking.balancebooksapp.com/?import=tools#data=' + encoded, '_blank');
+                BB_INTEGRATION.sendToApp(payload, 'fuel', true);
                 showToast('Data sent! Check the BalanceBooks tab.', 'success');
-                
+
             } catch (e) {
                 console.error('Integration error:', e);
                 showToast('Could not prepare data. Try downloading CSV instead.', 'error');
@@ -1773,6 +1206,22 @@
 
         // Initialize
         goToStep(1);
+
+        // Auto-detect provider from URL parameter (from SEO landing pages)
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const provider = params.get('provider');
+            if (provider && FUEL_CARD_FORMATS[provider]) {
+                detectedFormat = provider;
+                const fmt = FUEL_CARD_FORMATS[provider];
+                showToast(`${fmt.icon} ${fmt.name} selected — upload your file to get started`, 'success');
+            }
+        })();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>

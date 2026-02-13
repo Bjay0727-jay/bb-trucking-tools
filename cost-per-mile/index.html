@@ -6,94 +6,32 @@
     <title>Free Cost Per Mile Calculator | Owner Operator | BalanceBooks</title>
     <meta name="description" content="Free cost per mile calculator for truckers. Track all your operating expenses and know your true cost to run your truck. Essential for setting profitable rates.">
     <meta name="keywords" content="cost per mile calculator, trucking expenses, owner operator costs, operating cost, trucking calculator">
+    <meta property="og:title" content="Free Cost Per Mile Calculator | BalanceBooks">
+    <meta property="og:description" content="Free cost per mile calculator for truckers. Track all your operating expenses and know your true cost to run your truck.">
+    <meta property="og:url" content="https://tools.balancebooksapp.com/cost-per-mile">
+    <meta property="og:type" content="website">
     <link rel="canonical" href="https://tools.balancebooksapp.com/cost-per-mile">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Cost Per Mile Calculator",
+        "url": "https://tools.balancebooksapp.com/cost-per-mile",
+        "description": "Free cost per mile calculator for truckers. Track all your operating expenses and know your true cost to run your truck.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "BalanceBooks", "url": "https://balancebooksapp.com" }
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/shared.css">
     <style>
-        :root {
-            --navy-900: #0a1628;
-            --navy-800: #0f172a;
-            --navy-700: #1e293b;
-            --navy-600: #334155;
-            --navy-500: #475569;
-            --navy-400: #64748b;
-            --navy-300: #94a3b8;
-            --navy-200: #cbd5e1;
-            --navy-100: #e2e8f0;
-            --orange-500: #f97316;
-            --orange-400: #fb923c;
-            --teal-500: #14b8a6;
-            --green-500: #22c55e;
-            --red-500: #ef4444;
-            --purple-500: #a855f7;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
-            color: var(--navy-100);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            padding: 24px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
+        /* Page-specific overrides for Cost Per Mile */
         .logo-icon {
-            width: 44px;
-            height: 44px;
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-400) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-        }
-
-        .logo-text span { color: var(--orange-400); }
-
-        .hero {
-            text-align: center;
-            padding: 48px 0 32px;
-        }
-
-        .hero h1 {
-            font-size: clamp(28px, 4vw, 40px);
-            font-weight: 800;
-            color: white;
-            margin-bottom: 12px;
         }
 
         .hero h1 span {
@@ -103,34 +41,7 @@
             background-clip: text;
         }
 
-        .hero p {
-            font-size: 16px;
-            color: var(--navy-300);
-            max-width: 550px;
-            margin: 0 auto;
-        }
-
-        .app-container {
-            background: var(--navy-800);
-            border: 1px solid var(--navy-600);
-            border-radius: 24px;
-            overflow: hidden;
-            margin-bottom: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .app-body {
-            padding: 32px;
-        }
-
         .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--navy-700);
         }
@@ -253,12 +164,6 @@
             font-weight: 700;
         }
 
-        .divider {
-            height: 1px;
-            background: var(--navy-700);
-            margin: 32px 0;
-        }
-
         .results-section {
             background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
             border: 2px solid var(--orange-500);
@@ -324,96 +229,21 @@
         .tip-box {
             background: rgba(20, 184, 166, 0.1);
             border: 1px solid rgba(20, 184, 166, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 24px;
             text-align: left;
         }
 
         .tip-box h5 {
-            font-size: 14px;
             color: var(--teal-500);
-            margin-bottom: 8px;
-        }
-
-        .tip-box p {
-            font-size: 13px;
-            color: var(--navy-300);
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 32px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            border: none;
-            text-decoration: none;
-        }
-
-        .btn-secondary {
-            background: var(--navy-700);
-            color: var(--navy-200);
-            border: 1px solid var(--navy-600);
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--orange-500) 0%, var(--orange-400) 100%);
-            color: white;
-        }
-
-        footer {
-            text-align: center;
-            padding: 32px 0;
-            border-top: 1px solid var(--navy-700);
-        }
-
-        footer p {
-            color: var(--navy-400);
-            font-size: 14px;
-        }
-
-        footer a {
-            color: var(--orange-400);
-            text-decoration: none;
-        }
-
-        .tools-nav {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .tools-nav a {
-            color: var(--navy-300);
-            text-decoration: none;
-            font-size: 13px;
-            padding: 6px 12px;
-            border-radius: 6px;
-        }
-
-        .tools-nav a:hover {
-            color: white;
-            background: var(--navy-700);
         }
     </style>
 </head>
 <body>
+    <a href="#main" class="sr-only">Skip to main content</a>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -425,7 +255,18 @@
         </div>
     </header>
 
-    <main>
+    <nav class="tools-sidebar" aria-label="Tools">
+        <div class="tools-sidebar-inner">
+            <a href="/fuel-converter"><span class="nav-icon">⛽</span><span class="nav-label">Fuel Converter</span></a>
+            <a href="/ifta-calculator"><span class="nav-icon">📊</span><span class="nav-label">IFTA</span></a>
+            <a href="/load-calculator"><span class="nav-icon">💰</span><span class="nav-label">Load Calc</span></a>
+            <a href="/cost-per-mile" class="active"><span class="nav-icon">🛣️</span><span class="nav-label">Cost/Mile</span></a>
+            <a href="/deadhead-calculator"><span class="nav-icon">🔄</span><span class="nav-label">Deadhead</span></a>
+            <a href="/per-diem"><span class="nav-icon">📅</span><span class="nav-label">Per Diem</span></a>
+        </div>
+    </nav>
+
+    <main id="main">
         <div class="container">
             <section class="hero">
                 <h1><span>Cost Per Mile</span> Calculator</h1>
@@ -550,16 +391,25 @@
 
     <footer>
         <div class="container">
-            <div class="tools-nav">
-                <a href="/">🏠 All Tools</a>
-                <a href="/fuel-converter">⛽ Fuel Converter</a>
-                <a href="/ifta-calculator">📊 IFTA Calculator</a>
-                <a href="/load-calculator">💰 Load Calculator</a>
+            <div class="footer-brand">
+                <div class="logo-icon">🚛</div>
+                <div class="logo-text">Balance<span>Books</span></div>
             </div>
-            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a> • Data stays in your browser</p>
+            <div class="tools-nav">
+                <a href="/">All Tools</a>
+                <a href="/fuel-converter">Fuel Converter</a>
+                <a href="/ifta-calculator">IFTA Calculator</a>
+                <a href="/load-calculator">Load Calculator</a>
+                <a href="/cost-per-mile">Cost Per Mile</a>
+                <a href="/deadhead-calculator">Deadhead</a>
+                <a href="/per-diem">Per Diem</a>
+            </div>
+            <p>Free tools by <a href="https://balancebooksapp.com">BalanceBooks</a></p>
+            <div class="footer-meta">Data stays in your browser. Nothing is uploaded or stored on any server.</div>
         </div>
     </footer>
 
+    <script src="/js/integration.js"></script>
     <script>
         function calculate() {
             const miles = parseFloat(document.getElementById('monthlyMiles').value) || 10000;
@@ -658,18 +508,7 @@
             };
 
             try {
-                localStorage.setItem('bb_tools_export', JSON.stringify(payload));
-                
-                const msg = `Sync cost-per-mile settings to BalanceBooks?\n\n` +
-                    `• Total CPM: $${totalCPM.toFixed(2)}/mi\n` +
-                    `• Monthly Costs: $${(fixedTotal + variableTotal).toLocaleString()}\n` +
-                    `• Break-even Rate: $${totalCPM.toFixed(2)}/mi\n` +
-                    `• Recommended (20% profit): $${(totalCPM / 0.80).toFixed(2)}/mi\n\n` +
-                    `Click OK to open BalanceBooks Trucking.`;
-                
-                if (confirm(msg)) {
-                    window.open('https://trucking.balancebooksapp.com/settings?import=cpm', '_blank');
-                }
+                BB_INTEGRATION.sendToApp(payload, 'settings');
             } catch (e) {
                 console.error('Integration error:', e);
                 alert('Could not sync settings. Please try again.');
@@ -678,6 +517,11 @@
 
         // Initial calculation
         calculate();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>

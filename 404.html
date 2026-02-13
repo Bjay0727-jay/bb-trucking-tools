@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | BalanceBooks Tools</title>
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-900: #0a1628;
+            --navy-800: #0f172a;
+            --navy-700: #1e293b;
+            --navy-600: #334155;
+            --navy-400: #64748b;
+            --navy-300: #94a3b8;
+            --navy-100: #e2e8f0;
+            --orange-500: #f97316;
+            --orange-400: #fb923c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 50%, #0d1f35 100%);
+            color: var(--navy-100);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+        }
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+        }
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+        p {
+            font-size: 18px;
+            color: var(--navy-300);
+            margin-bottom: 40px;
+            max-width: 460px;
+        }
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .tools-list a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--navy-700);
+            border: 1px solid var(--navy-600);
+            border-radius: 12px;
+            color: var(--navy-100);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tools-list a:hover {
+            border-color: var(--orange-500);
+            transform: translateY(-2px);
+        }
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--orange-500) 0%, #ea580c 100%);
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-icon">🚛💨</div>
+    <h1>404</h1>
+    <p>This page took a wrong turn. Let's get you back on the road.</p>
+    <div class="tools-list">
+        <a href="/fuel-converter">⛽ Fuel Converter</a>
+        <a href="/ifta-calculator">📊 IFTA Calculator</a>
+        <a href="/load-calculator">💰 Load Calculator</a>
+        <a href="/cost-per-mile">🛣️ Cost Per Mile</a>
+        <a href="/deadhead-calculator">🔄 Deadhead Calculator</a>
+        <a href="/per-diem">📅 Per Diem</a>
+    </div>
+    <a href="/" class="home-btn">🏠 Back to All Tools</a>
+</body>
+</html>
