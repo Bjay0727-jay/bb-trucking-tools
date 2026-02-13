@@ -1,0 +1,353 @@
+From 092294cbd01c2800ab65f85a97a94d8d753f983e Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Feb 2026 17:30:42 +0000
+Subject: [PATCH] Add postMessage integration for cross-origin tools import
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Replace localStorage-based import detection with postMessage listener
+for secure cross-subdomain data transfer from tools.balancebooksapp.com.
+
+Changes:
+- Listen for 'bb-tools-import' postMessage events with origin validation
+- Send acknowledgment back to stop sender retries
+- Support #bbdata= URL hash fallback (when popup blocked)
+- Keep legacy base64 hash + localStorage fallback for dev
+- Add cost-per-mile import → updates app settings
+- Add deadhead-calculator import → creates load entry with cost analysis
+- Fix per-diem import to handle v2 payload format (perDiem.fullDays)
+- Update ToolsImportModal with summaries for all 6 tool sources
+
+https://claude.ai/code/session_01VVVSrHYTofQSDgBXR3GUHu
+---
+ src/App.jsx                     | 186 ++++++++++++++++++++++++--------
+ src/modals/ToolsImportModal.jsx |  39 ++++++-
+ 2 files changed, 175 insertions(+), 50 deletions(-)
+
+diff --git a/src/App.jsx b/src/App.jsx
+index c45aac0..36e633d 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -378,13 +378,62 @@ export default function App() {
+   };
+   // ============================================
+   // TOOLS IMPORT DETECTION (bb-trucking-tools integration)
+-  // Uses URL hash for cross-domain data transfer
++  // Uses postMessage (cross-origin) + URL hash fallback
+   // ============================================
+-  
++
+   useEffect(() => {
+     if (isLoading) return; // Wait for app to load first
+-    
+-    const checkForToolsImport = () => {
++
++    const TOOLS_ORIGIN = 'https://tools.balancebooksapp.com';
++
++    // Handler for incoming tool data (shared by both methods)
++    const processImportData = (data) => {
++      // Validate source
++      const validSources = ['fuel-converter', 'ifta-calculator', 'load-calculator', 'cost-per-mile', 'per-diem', 'deadhead-calculator'];
++      if (!validSources.includes(data.source)) {
++        setToolsImportError('Invalid import source: ' + data.source);
++        return;
++      }
++
++      // Check timestamp (reject if older than 1 hour)
++      if (data.timestamp) {
++        const importTime = new Date(data.timestamp);
++        if (new Date() - importTime > 60 * 60 * 1000) {
++          setToolsImportError('Import data expired. Please export again from tools.');
++          return;
++        }
++      }
++
++      // Valid import - show confirmation modal
++      console.log('[Tools Import] Valid data from:', data.source, '- Showing modal');
++      setToolsImportData(data);
++      setShowToolsImport(true);
++      setToolsImportError(null);
++    };
++
++    // Method 1: Listen for postMessage from tools site (cross-origin)
++    const handleMessage = (event) => {
++      // In development, also accept localhost origins
++      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
++      const isValidOrigin = event.origin === TOOLS_ORIGIN || (isDev && event.origin.includes('localhost'));
++
++      if (!isValidOrigin) return;
++      if (!event.data || event.data.type !== 'bb-tools-import') return;
++
++      console.log('[Tools Import] Data received via postMessage');
++
++      // Acknowledge receipt so sender stops retrying
++      if (event.source) {
++        event.source.postMessage({ type: 'bb-tools-ack' }, event.origin);
++      }
++
++      processImportData(event.data.payload);
++    };
++
++    window.addEventListener('message', handleMessage);
++
++    // Method 2: Check URL hash for encoded data (same-tab fallback when popup blocked)
++    const checkUrlImport = () => {
+       const urlParams = new URLSearchParams(window.location.search);
+       if (urlParams.get('import') !== 'tools') return;
+ 
+@@ -392,65 +441,50 @@ export default function App() {
+ 
+       try {
+         let data = null;
+-        
+-        // Method 1: Check URL hash for encoded data (cross-domain safe)
++
++        // Check for new #bbdata= hash format (from integration.js v2.0)
+         const hash = window.location.hash;
+-        if (hash && hash.includes('data=')) {
++        if (hash && hash.indexOf('#bbdata=') === 0) {
++          const encoded = hash.slice('#bbdata='.length);
++          data = JSON.parse(decodeURIComponent(encoded));
++          console.log('[Tools Import] Data loaded from URL hash (#bbdata)');
++        }
++
++        // Fallback: Check for legacy base64 #data= format
++        if (!data && hash && hash.includes('data=')) {
+           const encoded = hash.split('data=')[1];
+           if (encoded) {
+             try {
+               const jsonStr = decodeURIComponent(escape(atob(encoded)));
+               data = JSON.parse(jsonStr);
+-              console.log('[Tools Import] Data loaded from URL hash');
++              console.log('[Tools Import] Data loaded from URL hash (legacy base64)');
+             } catch (decodeErr) {
+-              console.error('[Tools Import] Failed to decode URL data:', decodeErr);
++              console.error('[Tools Import] Failed to decode legacy URL data:', decodeErr);
+             }
+           }
+         }
+-        
+-        // Method 2: Fallback to localStorage (same-domain only)
++
++        // Fallback: Check localStorage (same-origin only, for development)
+         if (!data) {
+           const stored = localStorage.getItem(BB_TOOLS_STORAGE_KEY);
+           if (stored) {
+             data = JSON.parse(stored);
++            localStorage.removeItem(BB_TOOLS_STORAGE_KEY);
+             console.log('[Tools Import] Data loaded from localStorage');
+           }
+         }
+-        
++
+         if (!data) {
+-          setToolsImportError('No import data found. The data may have been too large. Try downloading CSV and importing manually.');
++          // No data found yet — postMessage may arrive shortly, just clean URL
+           window.history.replaceState({}, '', window.location.pathname);
+           return;
+         }
+-        
+-        // Validate source
+-        const validSources = ['fuel-converter', 'ifta-calculator', 'load-calculator', 'cost-per-mile', 'per-diem', 'deadhead-calculator'];
+-        if (!validSources.includes(data.source)) {
+-          setToolsImportError('Invalid import source: ' + data.source);
+-          window.history.replaceState({}, '', window.location.pathname);
+-          return;
+-        }
+-
+-        // Check timestamp (reject if older than 1 hour)
+-        if (data.timestamp) {
+-          const importTime = new Date(data.timestamp);
+-          if (new Date() - importTime > 60 * 60 * 1000) {
+-            setToolsImportError('Import data expired. Please export again from tools.');
+-            localStorage.removeItem(BB_TOOLS_STORAGE_KEY);
+-            window.history.replaceState({}, '', window.location.pathname);
+-            return;
+-          }
+-        }
+-
+-        // Valid import - show confirmation modal
+-        console.log('[Tools Import] Valid data from:', data.source, '- Showing modal');
+-        setToolsImportData(data);
+-        setShowToolsImport(true);
+-        setToolsImportError(null);
+ 
+         // Clean URL (remove query params and hash)
+         window.history.replaceState({}, '', window.location.pathname);
+ 
++        processImportData(data);
++
+       } catch (e) {
+         console.error('[Tools Import] Error:', e);
+         setToolsImportError('Failed to read import data: ' + e.message);
+@@ -458,7 +492,12 @@ export default function App() {
+       }
+     };
+ 
+-    checkForToolsImport();
++    checkUrlImport();
++
++    // Cleanup listener on unmount
++    return () => {
++      window.removeEventListener('message', handleMessage);
++    };
+   }, [isLoading]);
+ 
+   // Handle confirmed import from tools
+@@ -525,18 +564,73 @@ export default function App() {
+           break;
+ 
+         case 'per-diem':
+-          if (toolsImportData.days) {
++          // Handle v2 payload format (perDiem object) and legacy format (flat days/rate)
++          const pd = toolsImportData.perDiem || {};
++          const pdDays = pd.fullDays || toolsImportData.days || 0;
++          const pdPartialDays = pd.partialDays || 0;
++          const pdRate = pd.dailyRate || toolsImportData.rate || 69;
++
++          if (pdDays || pdPartialDays) {
+             const newPerDiem = {
+               id: uid(),
+               startDate: toolsImportData.startDate || new Date().toISOString().split('T')[0],
+               endDate: toolsImportData.endDate || new Date().toISOString().split('T')[0],
+-              days: toolsImportData.days,
+-              rate: toolsImportData.rate || 80,
+-              total: toolsImportData.days * (toolsImportData.rate || 80)
++              days: pdDays,
++              partialDays: pdPartialDays,
++              rate: pdRate,
++              total: pd.totalDeduction || (pdDays * pdRate),
++              deductibleAmount: pd.deductibleAmount || 0,
++              taxSavings: pd.savings?.total || 0,
++              notes: 'Imported from Per Diem Calculator'
+             };
+-            
++
+             setPerDiemDays(prev => [...prev, newPerDiem]);
+             setActiveTab('perdiem');
++            console.log('[Tools Import] Added per diem entry: ' + pdDays + ' full days, ' + pdPartialDays + ' partial days');
++          }
++          break;
++
++        case 'cost-per-mile':
++          if (toolsImportData.settings) {
++            const cpmSettings = toolsImportData.settings;
++            // Merge CPM data into app settings
++            setSettings(prev => ({
++              ...prev,
++              monthlyMiles: cpmSettings.monthlyMiles || prev.monthlyMiles,
++              costPerMile: cpmSettings.calculated?.totalCPM || prev.costPerMile,
++              fixedCosts: cpmSettings.fixedCosts || prev.fixedCosts,
++              variableCosts: cpmSettings.variableCosts || prev.variableCosts,
++              breakEvenRate: cpmSettings.calculated?.breakEvenRate || cpmSettings.calculated?.totalCPM || 0,
++              recommendedRate: cpmSettings.calculated?.recommendedRate20 || (cpmSettings.calculated?.totalCPM / 0.80) || 0
++            }));
++            setActiveTab('settings');
++            console.log('[Tools Import] Updated cost-per-mile settings: $' + (cpmSettings.calculated?.totalCPM || 0).toFixed(2) + '/mi');
++          }
++          break;
++
++        case 'deadhead-calculator':
++          if (toolsImportData.deadhead) {
++            const dh = toolsImportData.deadhead;
++            // Create a load entry representing the deadhead cost analysis
++            const deadheadLoad = {
++              id: uid(),
++              date: new Date().toISOString().split('T')[0],
++              loadNumber: 'DH-' + Date.now().toString(36).toUpperCase(),
++              rate: 0,
++              loadedMiles: 0,
++              deadheadMiles: dh.miles || 0,
++              fuelCost: dh.costs?.fuel || 0,
++              otherExpenses: (dh.costs?.operating || 0) + (dh.costs?.time || 0),
++              stops: [
++                { location: 'Deadhead origin (from calculator)', type: 'pickup' },
++                { location: 'Deadhead destination (from calculator)', type: 'delivery' }
++              ],
++              notes: 'Deadhead cost analysis. Total: $' + (dh.costs?.total || 0).toFixed(2) + '. Min load rate needed: $' + (dh.minLoadRate || 0).toFixed(2)
++            };
++
++            setLoads(prev => [...prev, deadheadLoad]);
++            setActiveTab('loads');
++            console.log('[Tools Import] Added deadhead analysis: ' + dh.miles + ' empty miles, $' + (dh.costs?.total || 0).toFixed(2) + ' total cost');
+           }
+           break;
+ 
+@@ -545,7 +639,7 @@ export default function App() {
+       }
+ 
+       // Clear and close
+-      localStorage.removeItem(BB_TOOLS_STORAGE_KEY);
++      try { localStorage.removeItem(BB_TOOLS_STORAGE_KEY); } catch(e) {}
+       setShowToolsImport(false);
+       setToolsImportData(null);
+ 
+@@ -557,7 +651,7 @@ export default function App() {
+ 
+   // Cancel tools import
+   const cancelToolsImport = useCallback(() => {
+-    localStorage.removeItem(BB_TOOLS_STORAGE_KEY);
++    try { localStorage.removeItem(BB_TOOLS_STORAGE_KEY); } catch(e) {}
+     setShowToolsImport(false);
+     setToolsImportData(null);
+     setToolsImportError(null);
+diff --git a/src/modals/ToolsImportModal.jsx b/src/modals/ToolsImportModal.jsx
+index 0fa87c3..2a0abe1 100644
+--- a/src/modals/ToolsImportModal.jsx
++++ b/src/modals/ToolsImportModal.jsx
+@@ -45,16 +45,47 @@ const ToolsImportModal = ({
+             'Verdict: ' + (toolsImportData.load?.verdict || 'N/A')
+           ]
+         };
+-      case 'per-diem':
++      case 'cost-per-mile':
++        return {
++          icon: '🛣️',
++          title: 'Update Cost Per Mile',
++          details: [
++            'CPM: $' + (toolsImportData.settings?.calculated?.totalCPM || 0).toFixed(2) + '/mi',
++            'Monthly miles: ' + (toolsImportData.settings?.monthlyMiles || 0).toLocaleString(),
++            'Break-even: $' + (toolsImportData.settings?.calculated?.totalCPM || 0).toFixed(2) + '/mi',
++            'Recommended: $' + ((toolsImportData.settings?.calculated?.totalCPM || 0) / 0.80).toFixed(2) + '/mi (20% profit)'
++          ]
++        };
++      case 'per-diem': {
++        const pd = toolsImportData.perDiem || {};
++        const days = pd.fullDays || toolsImportData.days || 0;
++        const partial = pd.partialDays || 0;
++        const total = pd.totalDeduction || (days * (pd.dailyRate || toolsImportData.rate || 69));
++        const savings = pd.savings?.total || 0;
+         return {
+           icon: '📅',
+           title: 'Import Per Diem',
+           details: [
+-            (toolsImportData.days || 0) + ' days',
+-            '$' + (toolsImportData.rate || 80) + '/day',
+-            'Total: $' + ((toolsImportData.days || 0) * (toolsImportData.rate || 80)).toFixed(2)
++            days + ' full days' + (partial ? ' + ' + partial + ' partial' : ''),
++            '$' + (pd.dailyRate || toolsImportData.rate || 69) + '/day (IRS DOT rate)',
++            'Deduction: $' + total.toLocaleString(),
++            savings ? 'Tax savings: $' + savings.toLocaleString(undefined, { maximumFractionDigits: 0 }) : null
++          ].filter(Boolean)
++        };
++      }
++      case 'deadhead-calculator': {
++        const dh = toolsImportData.deadhead || {};
++        return {
++          icon: '🔄',
++          title: 'Import Deadhead Analysis',
++          details: [
++            (dh.miles || 0) + ' empty miles',
++            'Fuel: $' + (dh.costs?.fuel || 0).toFixed(2),
++            'Total cost: $' + (dh.costs?.total || 0).toFixed(2),
++            'Min load rate: $' + (dh.minLoadRate || 0).toFixed(2)
+           ]
+         };
++      }
+       default:
+         return { icon: '📥', title: 'Import Data', details: ['Data from BalanceBooks Tools'] };
+     }
+-- 
+2.43.0
+
