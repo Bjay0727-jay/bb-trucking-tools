@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bb-tools-v2';
+const CACHE_NAME = 'bb-tools-v3';
 const ASSETS = [
     '/',
     '/fuel-converter/',
@@ -54,7 +54,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     // Static assets: cache first, fall back to network
-    if (url.pathname.match(/\.(js|css|png|svg|json)$/)) {
+    if (url.pathname.match(/\.(js|css|png|svg|json|woff2)$/)) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;
