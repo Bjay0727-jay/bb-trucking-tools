@@ -151,7 +151,7 @@
                 <div class="app-body">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>🛣️ Deadhead Miles</label>
+                            <label for="deadheadMiles">🛣️ Deadhead Miles</label>
                             <div class="input-wrapper">
                                 <input type="number" id="deadheadMiles" class="has-suffix" value="150" oninput="calculate()">
                                 <span class="suffix">mi</span>
@@ -159,7 +159,7 @@
                             <span class="hint">Empty miles to the pickup</span>
                         </div>
                         <div class="form-group">
-                            <label>⛽ Fuel Price</label>
+                            <label for="fuelPrice">⛽ Fuel Price</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="fuelPrice" class="has-prefix has-suffix" value="3.50" step="0.05" oninput="calculate()">
@@ -167,14 +167,14 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>🚛 Truck MPG</label>
+                            <label for="mpg">🚛 Truck MPG</label>
                             <div class="input-wrapper">
                                 <input type="number" id="mpg" class="has-suffix" value="6.5" step="0.1" oninput="calculate()">
                                 <span class="suffix">mpg</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>💸 Other Costs</label>
+                            <label for="otherCosts">💸 Other Costs</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="otherCosts" class="has-prefix has-suffix" value="0.35" step="0.01" oninput="calculate()">
@@ -183,7 +183,7 @@
                             <span class="hint">Maintenance, wear, tires, etc.</span>
                         </div>
                         <div class="form-group full-width">
-                            <label>⏱️ Time Cost (Optional)</label>
+                            <label for="hourlyRate">⏱️ Time Cost (Optional)</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="hourlyRate" class="has-prefix has-suffix" value="25" oninput="calculate()">

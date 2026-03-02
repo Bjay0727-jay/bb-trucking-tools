@@ -198,7 +198,7 @@
                     <div class="section-title">📦 Load Details</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label><span class="icon">💵</span> Line Haul Rate</label>
+                            <label for="lineHaul"><span class="icon">💵</span> Line Haul Rate</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="lineHaul" class="has-prefix" value="2500" step="50" oninput="calculate()">
@@ -206,14 +206,14 @@
                             <span class="hint">Total rate for the load</span>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">🛣️</span> Loaded Miles</label>
+                            <label for="loadedMiles"><span class="icon">🛣️</span> Loaded Miles</label>
                             <div class="input-wrapper">
                                 <input type="number" id="loadedMiles" class="has-suffix" value="800" oninput="calculate()">
                                 <span class="suffix">mi</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">🔄</span> Deadhead Miles</label>
+                            <label for="deadheadMiles"><span class="icon">🔄</span> Deadhead Miles</label>
                             <div class="input-wrapper">
                                 <input type="number" id="deadheadMiles" class="has-suffix" value="50" oninput="calculate()">
                                 <span class="suffix">mi</span>
@@ -221,7 +221,7 @@
                             <span class="hint">Empty miles to pickup</span>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">➕</span> Fuel Surcharge</label>
+                            <label for="fuelSurcharge"><span class="icon">➕</span> Fuel Surcharge</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="fuelSurcharge" class="has-prefix" value="0" step="10" oninput="calculate()">
@@ -235,7 +235,7 @@
                     <div class="section-title">⚙️ Your Operating Costs</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label><span class="icon">⛽</span> Fuel Price</label>
+                            <label for="fuelPrice"><span class="icon">⛽</span> Fuel Price</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="fuelPrice" class="has-prefix has-suffix" value="3.50" step="0.05" oninput="calculate()">
@@ -243,14 +243,14 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">🚛</span> Truck MPG</label>
+                            <label for="mpg"><span class="icon">🚛</span> Truck MPG</label>
                             <div class="input-wrapper">
                                 <input type="number" id="mpg" class="has-suffix" value="6.5" step="0.1" oninput="calculate()">
                                 <span class="suffix">mpg</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">💸</span> Cost Per Mile</label>
+                            <label for="costPerMile"><span class="icon">💸</span> Cost Per Mile</label>
                             <div class="input-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="costPerMile" class="has-prefix has-suffix" value="0.45" step="0.01" oninput="calculate()">
@@ -259,7 +259,7 @@
                             <span class="hint">Insurance, maintenance, etc. (excl. fuel)</span>
                         </div>
                         <div class="form-group">
-                            <label><span class="icon">🏢</span> Dispatch/Broker Fee</label>
+                            <label for="dispatchFee"><span class="icon">🏢</span> Dispatch/Broker Fee</label>
                             <div class="input-wrapper">
                                 <input type="number" id="dispatchFee" class="has-suffix" value="0" step="1" oninput="calculate()">
                                 <span class="suffix">%</span>

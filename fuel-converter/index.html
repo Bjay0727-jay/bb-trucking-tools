@@ -674,8 +674,8 @@
                 dynamicTyping: false
             });
 
-            if (result.errors.length > 0) {
-                console.warn('Parse warnings:', result.errors);
+            if (result.errors.length > 0 && result.data.length < 2) {
+                showToast('CSV parsing encountered issues — check the file format', 'warning');
             }
 
             if (result.data.length < 2) {
