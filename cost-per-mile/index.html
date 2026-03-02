@@ -274,7 +274,7 @@
                 <div class="app-body">
                     <!-- Miles Input -->
                     <div class="miles-input">
-                        <label>🚛 Monthly Miles:</label>
+                        <label for="monthlyMiles">🚛 Monthly Miles:</label>
                         <input type="number" id="monthlyMiles" value="10000" oninput="calculate()">
                         <span class="hint">Average miles you drive per month</span>
                     </div>
@@ -283,28 +283,28 @@
                     <div class="section-title">📋 Fixed Costs (Monthly)</div>
                     <div class="expense-grid" id="fixed-costs">
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🚛</span> Truck Payment</div>
-                            <input type="number" data-category="fixed" value="1800" oninput="calculate()">
+                            <label for="truckPayment" class="label"><span class="icon">🚛</span> Truck Payment</label>
+                            <input type="number" id="truckPayment" data-category="fixed" value="1800" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.18/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🛡️</span> Insurance</div>
-                            <input type="number" data-category="fixed" value="1200" oninput="calculate()">
+                            <label for="insurance" class="label"><span class="icon">🛡️</span> Insurance</label>
+                            <input type="number" id="insurance" data-category="fixed" value="1200" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.12/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🏷️</span> Permits & Licenses</div>
-                            <input type="number" data-category="fixed" value="200" oninput="calculate()">
+                            <label for="permitsLicenses" class="label"><span class="icon">🏷️</span> Permits & Licenses</label>
+                            <input type="number" id="permitsLicenses" data-category="fixed" value="200" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.02/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">📱</span> ELD / Subscriptions</div>
-                            <input type="number" data-category="fixed" value="75" oninput="calculate()">
+                            <label for="eldSubscriptions" class="label"><span class="icon">📱</span> ELD / Subscriptions</label>
+                            <input type="number" id="eldSubscriptions" data-category="fixed" value="75" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.01/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🅿️</span> Parking / Tolls (avg)</div>
-                            <input type="number" data-category="fixed" value="300" oninput="calculate()">
+                            <label for="parkingTolls" class="label"><span class="icon">🅿️</span> Parking / Tolls (avg)</label>
+                            <input type="number" id="parkingTolls" data-category="fixed" value="300" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.03/mi</div>
                         </div>
                     </div>
@@ -317,28 +317,28 @@
                     <div class="section-title">⚙️ Variable Costs (Monthly Estimate)</div>
                     <div class="expense-grid" id="variable-costs">
                         <div class="expense-row">
-                            <div class="label"><span class="icon">⛽</span> Fuel</div>
-                            <input type="number" data-category="variable" value="4500" oninput="calculate()">
+                            <label for="fuel" class="label"><span class="icon">⛽</span> Fuel</label>
+                            <input type="number" id="fuel" data-category="variable" value="4500" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.45/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🔧</span> Maintenance / Repairs</div>
-                            <input type="number" data-category="variable" value="500" oninput="calculate()">
+                            <label for="maintenanceRepairs" class="label"><span class="icon">🔧</span> Maintenance / Repairs</label>
+                            <input type="number" id="maintenanceRepairs" data-category="variable" value="500" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.05/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🛞</span> Tires</div>
-                            <input type="number" data-category="variable" value="300" oninput="calculate()">
+                            <label for="tires" class="label"><span class="icon">🛞</span> Tires</label>
+                            <input type="number" id="tires" data-category="variable" value="300" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.03/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">💧</span> DEF / Oil / Fluids</div>
-                            <input type="number" data-category="variable" value="150" oninput="calculate()">
+                            <label for="defOilFluids" class="label"><span class="icon">💧</span> DEF / Oil / Fluids</label>
+                            <input type="number" id="defOilFluids" data-category="variable" value="150" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.02/mi</div>
                         </div>
                         <div class="expense-row">
-                            <div class="label"><span class="icon">🧹</span> Truck Wash / Misc</div>
-                            <input type="number" data-category="variable" value="100" oninput="calculate()">
+                            <label for="truckWashMisc" class="label"><span class="icon">🧹</span> Truck Wash / Misc</label>
+                            <input type="number" id="truckWashMisc" data-category="variable" value="100" oninput="calculate()">
                             <div class="cpm" data-cpm>$0.01/mi</div>
                         </div>
                     </div>

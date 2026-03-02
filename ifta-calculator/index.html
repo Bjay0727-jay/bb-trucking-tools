@@ -90,7 +90,8 @@
         .quarter-btn.active { background: var(--teal-500); border-color: var(--teal-500); color: white; }
 
         /* Input sections */
-        .input-section { margin-bottom: 32px; }
+        .input-section { margin-bottom: 32px; border: none; padding: 0; }
+        .input-section legend { display: contents; }
         .input-section h3 {
             font-size: 16px;
             font-weight: 700;
@@ -296,22 +297,22 @@
                 <div class="app-body">
                     <!-- MPG Input -->
                     <div class="mpg-input">
-                        <label>🚛 Fleet Average MPG:</label>
+                        <label for="avgMpg">🚛 Fleet Average MPG:</label>
                         <input type="number" id="avgMpg" value="6.5" step="0.1" min="1" max="20">
                         <span class="hint">Used to calculate taxable gallons per state</span>
                     </div>
 
                     <!-- Miles by State -->
-                    <div class="input-section">
-                        <h3>🛣️ Miles Driven by State</h3>
+                    <fieldset class="input-section">
+                        <legend><h3>🛣️ Miles Driven by State</h3></legend>
                         <div class="state-grid" id="milesGrid"></div>
-                    </div>
+                    </fieldset>
 
                     <!-- Gallons by State -->
-                    <div class="input-section">
-                        <h3>⛽ Gallons Purchased by State</h3>
+                    <fieldset class="input-section">
+                        <legend><h3>⛽ Gallons Purchased by State</h3></legend>
                         <div class="state-grid" id="gallonsGrid"></div>
-                    </div>
+                    </fieldset>
 
                     <!-- Totals -->
                     <div class="totals-row">
@@ -388,8 +389,8 @@
 
     <script src="/js/integration.js"></script>
     <script>
-        // 2024/2025 IFTA Tax Rates (diesel) - cents per gallon
-        const STATE_TAX_RATES = {
+        // Default IFTA Tax Rates (diesel) — overridden by /data/rates.json at runtime
+        let STATE_TAX_RATES = {
             'AL': { name: 'Alabama', rate: 0.29 },
             'AZ': { name: 'Arizona', rate: 0.26 },
             'AR': { name: 'Arkansas', rate: 0.285 },
@@ -446,22 +447,38 @@
         let milesData = {};
         let gallonsData = {};
 
-        function init() {
+        async function init() {
+            // Load rates from JSON (falls back to hardcoded defaults on error)
+            try {
+                const res = await fetch('/data/rates.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.iftaRates && data.iftaRates.diesel) {
+                        for (const [code, rate] of Object.entries(data.iftaRates.diesel)) {
+                            if (STATE_TAX_RATES[code]) {
+                                STATE_TAX_RATES[code].rate = rate;
+                            }
+                        }
+                    }
+                }
+            } catch (e) { /* offline — use hardcoded defaults */ }
+
             // Build state inputs
             const sortedStates = [...PRIORITY_STATES, ...Object.keys(STATE_TAX_RATES).filter(s => !PRIORITY_STATES.includes(s))];
-            
+
             const milesGrid = document.getElementById('milesGrid');
             const gallonsGrid = document.getElementById('gallonsGrid');
 
             sortedStates.forEach(code => {
                 milesData[code] = 0;
                 gallonsData[code] = 0;
+                const name = STATE_TAX_RATES[code].name;
 
                 // Miles input
                 milesGrid.innerHTML += `
                     <div class="state-input">
-                        <span class="state-code">${code}</span>
-                        <input type="number" placeholder="0" data-state="${code}" data-type="miles" oninput="updateValue(this)">
+                        <label for="miles-${code}" class="state-code">${code}</label>
+                        <input type="number" id="miles-${code}" placeholder="0" data-state="${code}" data-type="miles" oninput="updateValue(this)" aria-label="${name} miles">
                         <span class="unit">mi</span>
                     </div>
                 `;
@@ -469,8 +486,8 @@
                 // Gallons input
                 gallonsGrid.innerHTML += `
                     <div class="state-input">
-                        <span class="state-code">${code}</span>
-                        <input type="number" placeholder="0" step="0.1" data-state="${code}" data-type="gallons" oninput="updateValue(this)">
+                        <label for="gallons-${code}" class="state-code">${code}</label>
+                        <input type="number" id="gallons-${code}" placeholder="0" step="0.1" data-state="${code}" data-type="gallons" oninput="updateValue(this)" aria-label="${name} gallons">
                         <span class="unit">gal</span>
                     </div>
                 `;

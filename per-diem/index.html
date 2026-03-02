@@ -187,17 +187,17 @@
                     <!-- Input Form -->
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>📆 Days Away From Home</label>
+                            <label for="daysAway">📆 Days Away From Home</label>
                             <input type="number" id="daysAway" value="250" oninput="calculate()">
                             <span class="hint">Full days on the road (overnight)</span>
                         </div>
                         <div class="form-group">
-                            <label>🌓 Partial Days</label>
+                            <label for="partialDays">🌓 Partial Days</label>
                             <input type="number" id="partialDays" value="24" oninput="calculate()">
                             <span class="hint">Departure/arrival days (75% rate)</span>
                         </div>
                         <div class="form-group">
-                            <label>💵 Your Tax Bracket</label>
+                            <label for="taxBracket">💵 Your Tax Bracket</label>
                             <select id="taxBracket" onchange="calculate()">
                                 <option value="0.10">10% ($0 - $11,600)</option>
                                 <option value="0.12">12% ($11,601 - $47,150)</option>
@@ -209,7 +209,7 @@
                             <span class="hint">Your marginal federal tax rate</span>
                         </div>
                         <div class="form-group">
-                            <label>🏛️ State Tax Rate</label>
+                            <label for="stateRate">🏛️ State Tax Rate</label>
                             <input type="number" id="stateRate" value="5" step="0.1" oninput="calculate()">
                             <span class="hint">Your state income tax % (0 if none)</span>
                         </div>
@@ -298,10 +298,22 @@
 
     <script src="/js/integration.js"></script>
     <script>
-        const DAILY_RATE = 69;
-        const PARTIAL_RATE = DAILY_RATE * 0.75;
-        const DOT_DEDUCTION_RATE = 0.80; // DOT workers can deduct 80% vs 50%
-        const SE_TAX_RATE = 0.153; // Self-employment tax rate
+        // Defaults — overridden by /data/rates.json at runtime
+        let DAILY_RATE = 69;
+        let PARTIAL_RATE = DAILY_RATE * 0.75;
+        let DOT_DEDUCTION_RATE = 0.80; // DOT workers can deduct 80% vs 50%
+        let SE_TAX_RATE = 0.153; // Self-employment tax rate
+
+        // Load rates from JSON (falls back to defaults on error)
+        fetch('/data/rates.json').then(r => r.ok ? r.json() : null).then(data => {
+            if (data && data.perDiem) {
+                DAILY_RATE = data.perDiem.dailyRate;
+                PARTIAL_RATE = DAILY_RATE * (data.perDiem.partialDayPercent / 100);
+                DOT_DEDUCTION_RATE = data.perDiem.dotDeductionPercent / 100;
+                SE_TAX_RATE = data.perDiem.selfEmploymentTaxRate / 100;
+                calculate(); // Recalculate with loaded rates
+            }
+        }).catch(() => { /* offline — use defaults */ });
 
         function calculate() {
             const fullDays = parseFloat(document.getElementById('daysAway').value) || 0;

@@ -400,7 +400,7 @@ header {
 
 .form-group .hint {
     font-size: var(--fs-xs);
-    color: var(--navy-400);
+    color: var(--navy-300);
     line-height: 1.4;
 }
 
@@ -448,7 +448,7 @@ header {
 .result-card .label {
     font-size: var(--fs-xs);
     font-weight: 500;
-    color: var(--navy-400);
+    color: var(--navy-300);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -469,7 +469,7 @@ header {
 
 .result-card .sub {
     font-size: 11px;
-    color: var(--navy-400);
+    color: var(--navy-300);
     margin-top: 4px;
 }
 
@@ -576,7 +576,7 @@ footer {
 }
 
 footer p {
-    color: var(--navy-400);
+    color: var(--navy-300);
     font-size: var(--fs-sm);
     line-height: 1.6;
 }
@@ -621,7 +621,7 @@ footer a:hover {
     padding-top: 20px;
     border-top: 1px solid var(--navy-700);
     font-size: var(--fs-xs);
-    color: var(--navy-500);
+    color: var(--navy-400);
 }
 
 /* === Responsive === */

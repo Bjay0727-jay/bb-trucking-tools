@@ -83,46 +83,46 @@
   to = "/per-diem/index.html"
   status = 200
 
-# Fuel card provider pages
+# Fuel card provider pages — server-side 301 redirects (better SEO than client-side)
 [[redirects]]
   from = "/loves-converter"
-  to = "/loves-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=loves"
+  status = 301
 
 [[redirects]]
   from = "/pilot-converter"
-  to = "/pilot-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=pilot"
+  status = 301
 
 [[redirects]]
   from = "/comdata-converter"
-  to = "/comdata-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=comdata"
+  status = 301
 
 [[redirects]]
   from = "/efs-converter"
-  to = "/efs-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=efs"
+  status = 301
 
 [[redirects]]
   from = "/wex-converter"
-  to = "/wex-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=wex"
+  status = 301
 
 [[redirects]]
   from = "/fuelman-converter"
-  to = "/fuelman-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=fuelman"
+  status = 301
 
 [[redirects]]
   from = "/tcs-converter"
-  to = "/tcs-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=tcs"
+  status = 301
 
 [[redirects]]
   from = "/ta-petro-converter"
-  to = "/ta-petro-converter/index.html"
-  status = 200
+  to = "/fuel-converter?provider=ta-petro"
+  status = 301
 
 # 404 page
 [[redirects]]
