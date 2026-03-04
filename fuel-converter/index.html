@@ -217,11 +217,7 @@
             color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4); }
-        .btn-import {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-        .btn-import:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); }
+
         .export-options { display: flex; gap: 12px; }
 
         /* Success screen */
@@ -430,9 +426,6 @@
                             <button class="btn btn-success" onclick="exportExcel()">
                                 <span>📊</span> Download Excel
                             </button>
-                            <button class="btn btn-import" onclick="sendToBalanceBooks()">
-                                <span>🚀</span> Import to App
-                            </button>
                         </div>
                     </div>
                 </section>
@@ -441,7 +434,7 @@
                 <section class="success-section" id="step4">
                     <div class="success-icon">✓</div>
                     <h3>Export Complete!</h3>
-                    <p>Your fuel log has been converted and downloaded. Import it into BalanceBooks to start tracking.</p>
+                    <p>Your fuel log has been converted and downloaded.</p>
                     <div class="success-actions">
                         <button class="btn btn-secondary" onclick="resetConverter()">
                             <span>📤</span> Convert Another File
@@ -480,7 +473,6 @@
         <span id="toastMessage">Success!</span>
     </div>
 
-    <script src="/js/integration.js"></script>
     <script>
         // ============ UTILITIES ============
         function escapeHtml(str) {
@@ -1102,56 +1094,6 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }
-
-        // ============ BALANCEBOOKS INTEGRATION (URL hash transfer) ============
-        function sendToBalanceBooks() {
-            if (processedData.length === 0) {
-                showToast('No data to import. Please convert a file first.', 'error');
-                return;
-            }
-
-            // Prepare payload for BalanceBooks
-            const payload = {
-                source: 'fuel-converter',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                provider: detectedFormat || 'unknown',
-                rowCount: processedData.length,
-                data: processedData.map(row => ({
-                    date: row.date || '',
-                    location: row.location || '',
-                    city: row.city || '',
-                    state: row.state || '',
-                    gallons: parseFloat(row.gallons) || 0,
-                    pricePerGallon: parseFloat(row.pricePerGal) || 0,
-                    totalAmount: parseFloat(row.totalCost) || 0,
-                    fuelType: row.fuelType || 'Diesel',
-                    odometer: row.odometer || '',
-                    truckStop: row.truckId || detectedFormat || ''
-                })),
-                summary: {
-                    gallons: processedData.reduce((s, r) => s + (parseFloat(r.gallons) || 0), 0),
-                    amount: processedData.reduce((s, r) => s + (parseFloat(r.totalCost) || 0), 0)
-                }
-            };
-
-            // Show confirmation
-            const confirmMsg = `Ready to import ${payload.rowCount} fuel transactions:\n\n` +
-                `• Total Gallons: ${payload.summary.gallons.toFixed(1)}\n` +
-                `• Total Amount: $${payload.summary.amount.toFixed(2)}\n\n` +
-                `Click OK to open BalanceBooks Trucking.`;
-
-            if (!confirm(confirmMsg)) return;
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'fuel', true);
-                showToast('Data sent! Check the BalanceBooks tab.', 'success');
-
-            } catch (e) {
-                console.error('Integration error:', e);
-                showToast('Could not prepare data. Try downloading CSV instead.', 'error');
-            }
         }
 
         // ============ NAVIGATION ============

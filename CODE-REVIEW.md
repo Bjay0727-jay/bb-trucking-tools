@@ -1,7 +1,7 @@
 # Code Review: BalanceBooks Trucking Tools
 
 **Reviewed:** 2026-02-05
-**Scope:** Full codebase review — security, bugs, architecture, performance, accessibility, SEO, Netlify config, PWA, and integration with [balancebooks-trucking](https://github.com/Bjay0727-jay/balancebooks-trucking)
+**Scope:** Full codebase review — security, bugs, architecture, performance, accessibility, SEO, Netlify config, PWA
 
 ---
 
@@ -46,54 +46,11 @@ All JavaScript is inline in every HTML file, so `unsafe-inline` is required in t
 
 **Recommendation:** Long-term, extract JavaScript into separate `.js` files and use nonce-based CSP or hashes. Short-term, this is acceptable for a static site with no user accounts, but be aware it allows any injected script to execute.
 
-### 1c. localStorage data transfer has no origin validation (MEDIUM)
-
-**File:** `js/integration.js:29`, `ifta-calculator/index.html:960`, `load-calculator/index.html:868`
-
-Data is written to `localStorage` with a well-known key (`bb_tools_export`) and then the receiving app is expected to read it. Any script running on the same origin can read or tamper with this data.
-
-**Recommendation:** Add a HMAC or checksum to the payload so the receiving app can verify integrity. At minimum, the timestamp-based expiry (mentioned in INTEGRATION.md) should be enforced in the tools themselves, not just documented.
-
-### 1d. Base64 URL encoding is not encryption (LOW)
-
-**File:** `fuel-converter/index.html:1709`
-
-```js
-const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-```
-
-This uses `btoa()` which is just encoding, not encryption. Anyone can decode the URL hash. This is fine since the data isn't secret, but the code comment says "Encode data for URL transfer (base64)" which could mislead future developers into thinking it provides security.
-
-**Recommendation:** Add a comment clarifying this is for URL-safe transport, not security.
-
 ---
 
 ## 2. Bugs
 
-### 2a. IFTA `sendToBalanceBooks()` uses wrong `data-field` attribute (HIGH)
-
-**File:** `ifta-calculator/index.html:907-908`
-
-```js
-const milesInput = document.querySelector(`input[data-state="${abbr}"][data-field="miles"]`);
-const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-field="gallons"]`);
-```
-
-But the inputs are created with `data-type`, not `data-field`:
-
-```html
-<input ... data-state="${code}" data-type="miles" ...>
-```
-
-This means `sendToBalanceBooks()` will **always find null** for every input, and the function will always trigger the "Please enter miles and gallons" alert, making the BalanceBooks integration completely non-functional for IFTA.
-
-**Fix:** Change `data-field` to `data-type` in both selectors:
-```js
-const milesInput = document.querySelector(`input[data-state="${abbr}"][data-type="miles"]`);
-const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-type="gallons"]`);
-```
-
-### 2b. IFTA MPG calculation uses running totals before they're accumulated (MEDIUM)
+### 2a. IFTA MPG calculation uses running totals before they're accumulated (MEDIUM)
 
 **File:** `ifta-calculator/index.html:916`
 
@@ -110,21 +67,7 @@ On the first iteration, both are 0, so it falls back to 6.5. On subsequent itera
 const mpg = parseFloat(document.getElementById('avgMpg').value) || 6.5;
 ```
 
-### 2c. `getCurrentQuarter()` always returns current quarter, ignoring user selection (LOW)
-
-**File:** `ifta-calculator/index.html:978-984`
-
-The quarter selector buttons update the UI but `sendToBalanceBooks()` calls `getCurrentQuarter()` which returns the calendar quarter, not the selected one.
-
-**Fix:** Read the active quarter button instead:
-```js
-function getSelectedQuarter() {
-    const btn = document.querySelector('.quarter-btn.active');
-    return btn ? btn.dataset.q : getCurrentQuarter();
-}
-```
-
-### 2d. Mobile menu button has no corresponding `.mobile-nav` element (LOW)
+### 2c. Mobile menu button has no corresponding `.mobile-nav` element (LOW)
 
 **File:** `index.html:567`
 
@@ -136,7 +79,7 @@ There is no `.mobile-nav` element in the DOM, and no CSS for `.mobile-menu-btn`.
 
 **Fix:** Either implement the mobile navigation or remove the button.
 
-### 2e. Fuel converter accepts `.xls`/`.xlsx` but parses them as text (LOW)
+### 2d. Fuel converter accepts `.xls`/`.xlsx` but parses them as text (LOW)
 
 **File:** `fuel-converter/index.html:1221-1228`
 
@@ -156,11 +99,9 @@ Every HTML file contains a near-identical copy of the base styles (CSS variables
 
 ### 3b. No shared JavaScript utilities
 
-Each tool reimplements common patterns: number formatting, confirmation dialogs, BalanceBooks integration, toast notifications, etc. The `js/integration.js` exists but is not imported by any tool — they all implement integration inline.
+Each tool reimplements common patterns: number formatting, confirmation dialogs, toast notifications, etc.
 
-**Recommendation:**
-- Create `js/shared.js` for common utilities (formatting, toasts, etc.)
-- Actually use `js/integration.js` via `<script src="/js/integration.js">` instead of duplicating the integration code in every file.
+**Recommendation:** Create `js/shared.js` for common utilities (formatting, toasts, etc.).
 
 ### 3c. Inline JavaScript makes individual tools 800-1700+ lines
 
@@ -298,50 +239,7 @@ if (provider) {
 
 ---
 
-## 7. Integration Issues (with balancebooks-trucking)
-
-### 7a. `js/integration.js` is never loaded by any tool
-
-The shared integration module exists but isn't referenced by any HTML file. Every tool has its own inline integration code instead. This means the shared module is dead code.
-
-**Recommendation:** Either import it in each tool (`<script src="/js/integration.js"></script>`) and refactor the inline code to use it, or remove the file to avoid confusion.
-
-### 7b. Inconsistent integration patterns across tools
-
-| Tool | Integration Method | Confirmation | Destination Route |
-|------|--------------------|-------------|-------------------|
-| Fuel Converter | Base64 URL hash | `confirm()` | `/?import=tools#data=...` |
-| IFTA Calculator | localStorage | `confirm()` | `/ifta?import=tools` |
-| Load Calculator | localStorage | `confirm()` | `/loads?import=tools` |
-| Cost Per Mile | localStorage | `confirm()` | `/settings?import=cpm` |
-| Deadhead | None (just links) | N/A | Homepage |
-| Per Diem | None (just links) | N/A | Homepage |
-
-The fuel converter uses a completely different transfer mechanism (URL hash with base64) than the other tools (localStorage). This means the receiving app needs to support two different import methods.
-
-**Recommendation:** Standardize on one approach. localStorage is simpler and has no size limitations from URL length. The fuel converter should use the same localStorage pattern as the other tools.
-
-### 7c. Import parameter inconsistency
-
-Cost Per Mile uses `?import=cpm` while all other tools use `?import=tools`. The receiving app needs to handle both.
-
-**Recommendation:** Standardize on `?import=tools` and use the `source` field in the payload to differentiate.
-
-### 7d. No error handling for `window.open()` popup blocking
-
-All tools use `window.open()` to open BalanceBooks. Modern browsers block popups unless triggered by a direct user action. While `confirm() -> window.open()` generally works, there's no fallback if the popup is blocked.
-
-**Recommendation:** Add a fallback link:
-```js
-const win = window.open(url, '_blank');
-if (!win) {
-    // Show a clickable link instead
-}
-```
-
----
-
-## 8. Netlify Configuration
+## 7. Netlify Configuration
 
 ### 8a. SPA fallback returns 404 status (CORRECT but worth noting)
 
@@ -377,7 +275,7 @@ There are no external `.css` files in the project — all styles are inline `<st
 
 ---
 
-## 9. PWA Issues
+## 8. PWA Issues
 
 ### 9a. PNG icons don't exist
 
@@ -404,7 +302,7 @@ References to `fuel-96.png`, `ifta-96.png`, `load-96.png` — none of these file
 
 ---
 
-## 10. General Recommendations
+## 9. General Recommendations
 
 ### 10a. Add a `404.html` page
 
@@ -448,13 +346,9 @@ The `$69/day` rate is noted as "2024-2025 IRS DOT Rate." IRS rates change annual
 
 | Priority | Issue | Status |
 |----------|-------|--------|
-| **P0** | IFTA `sendToBalanceBooks()` broken (wrong data attribute) | FIXED |
 | **P0** | XSS via innerHTML in fuel converter | FIXED |
 | **P1** | IFTA MPG uses running totals (wrong calculation) | FIXED |
-| **P1** | Quarter selector ignored in export | FIXED |
 | **P1** | PWA icons missing (install failures) | FIXED — 8 PNG sizes generated |
-| **P1** | `js/integration.js` is dead code | FIXED — loaded by all 4 tools |
-| **P2** | Inconsistent integration patterns | FIXED — all tools use localStorage + BB_INTEGRATION |
 | **P2** | Accessibility gaps | FIXED — focus-visible, skip nav, sr-only |
 | **P2** | .xls/.xlsx parsed as garbled text | FIXED — rejected with clear error |
 | **P2** | Footer nav inconsistent | FIXED — all tools link to all others |

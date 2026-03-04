@@ -233,7 +233,7 @@
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
                         <a href="/load-calculator" class="btn btn-secondary">💰 Load Calculator</a>
-                        <button class="btn btn-primary" onclick="sendToApp()">🚀 Send to BalanceBooks</button>
+
                     </div>
                 </div>
             </div>
@@ -260,7 +260,6 @@
         </div>
     </footer>
 
-    <script src="/js/integration.js"></script>
     <script>
         function calculate() {
             const deadheadMiles = parseFloat(document.getElementById('deadheadMiles').value) || 0;
@@ -296,50 +295,6 @@
             document.getElementById('otherCosts').value = 0.35;
             document.getElementById('hourlyRate').value = 25;
             calculate();
-        }
-
-        function sendToApp() {
-            const deadheadMiles = parseFloat(document.getElementById('deadheadMiles').value) || 0;
-            const fuelPrice = parseFloat(document.getElementById('fuelPrice').value) || 3.50;
-            const mpg = parseFloat(document.getElementById('mpg').value) || 6.5;
-            const otherCosts = parseFloat(document.getElementById('otherCosts').value) || 0;
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-
-            const gallons = deadheadMiles / mpg;
-            const fuelCost = gallons * fuelPrice;
-            const operatingCost = deadheadMiles * otherCosts;
-            const hours = deadheadMiles / 55;
-            const timeCost = hours * hourlyRate;
-            const totalCost = fuelCost + operatingCost + timeCost;
-
-            const payload = {
-                source: 'deadhead-calculator',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                deadhead: {
-                    miles: deadheadMiles,
-                    fuelPrice: fuelPrice,
-                    mpg: mpg,
-                    otherCostsPerMile: otherCosts,
-                    hourlyRate: hourlyRate,
-                    gallonsUsed: parseFloat(gallons.toFixed(1)),
-                    hours: parseFloat(hours.toFixed(1)),
-                    costs: {
-                        fuel: parseFloat(fuelCost.toFixed(2)),
-                        operating: parseFloat(operatingCost.toFixed(2)),
-                        time: parseFloat(timeCost.toFixed(2)),
-                        total: parseFloat(totalCost.toFixed(2))
-                    },
-                    minLoadRate: parseFloat(totalCost.toFixed(2))
-                }
-            };
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'loads');
-            } catch (e) {
-                console.error('Integration error:', e);
-                alert('Could not prepare data. Please try again.');
-            }
         }
 
         // Initial calculation

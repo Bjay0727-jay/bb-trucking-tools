@@ -359,7 +359,6 @@
                         <div class="action-buttons">
                             <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
                             <button class="btn btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
-                            <button class="btn btn-primary" onclick="sendToBalanceBooks()">🚀 Send to BalanceBooks</button>
                         </div>
                     </div>
                 </div>
@@ -387,7 +386,6 @@
         </div>
     </footer>
 
-    <script src="/js/integration.js"></script>
     <script>
         // Default IFTA Tax Rates (diesel) — overridden by /data/rates.json at runtime
         let STATE_TAX_RATES = {
@@ -608,90 +606,6 @@
         function exportPDF() {
             // Simple print-based PDF export
             window.print();
-        }
-
-        // ============ BALANCEBOOKS INTEGRATION ============
-        function sendToBalanceBooks() {
-            // Collect all state data
-            const stateData = [];
-            let totalMiles = 0;
-            let totalGallons = 0;
-            let totalTaxOwed = 0;
-
-            Object.keys(STATE_TAX_RATES).forEach(abbr => {
-                const milesInput = document.querySelector(`input[data-state="${abbr}"][data-type="miles"]`);
-                const gallonsInput = document.querySelector(`input[data-state="${abbr}"][data-type="gallons"]`);
-                
-                if (milesInput && gallonsInput) {
-                    const miles = parseFloat(milesInput.value) || 0;
-                    const gallons = parseFloat(gallonsInput.value) || 0;
-                    
-                    if (miles > 0 || gallons > 0) {
-                        const state = STATE_TAX_RATES[abbr];
-                        const mpgValue = parseFloat(document.getElementById('avgMpg').value) || 6.5;
-                        const taxableGallons = miles / mpgValue;
-                        const taxOwed = (taxableGallons - gallons) * state.rate;
-                        
-                        stateData.push({
-                            state: abbr,
-                            name: state.name,
-                            miles: miles,
-                            gallons: gallons,
-                            taxRate: state.rate,
-                            taxableGallons: taxableGallons,
-                            taxOwed: taxOwed
-                        });
-                        
-                        totalMiles += miles;
-                        totalGallons += gallons;
-                        totalTaxOwed += taxOwed;
-                    }
-                }
-            });
-
-            if (stateData.length === 0) {
-                alert('Please enter miles and gallons for at least one state.');
-                return;
-            }
-
-            const avgMpg = parseFloat(document.getElementById('avgMpg').value) || 6.5;
-
-            // Prepare payload
-            const payload = {
-                source: 'ifta-calculator',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                quarter: getSelectedQuarter(),
-                year: new Date().getFullYear(),
-                states: stateData,
-                summary: {
-                    totalMiles: totalMiles,
-                    totalGallons: totalGallons,
-                    mpg: avgMpg,
-                    totalTaxOwed: totalTaxOwed.toFixed(2),
-                    statesWithActivity: stateData.length
-                }
-            };
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'ifta');
-            } catch (e) {
-                console.error('Integration error:', e);
-                alert('Could not prepare data. Please try the PDF export instead.');
-            }
-        }
-
-        function getSelectedQuarter() {
-            const activeBtn = document.querySelector('.quarter-btn.active');
-            return activeBtn ? activeBtn.dataset.q : getCurrentQuarter();
-        }
-
-        function getCurrentQuarter() {
-            const month = new Date().getMonth();
-            if (month < 3) return 'Q1';
-            if (month < 6) return 'Q2';
-            if (month < 9) return 'Q3';
-            return 'Q4';
         }
 
         // Initialize
