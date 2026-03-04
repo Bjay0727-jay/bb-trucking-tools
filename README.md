@@ -173,4 +173,3 @@ Free for use. Built by BalanceBooks.
 ## 🤝 Support
 
 - Website: [balancebooksapp.com](https://balancebooksapp.com)
-- Trucking App: [trucking.balancebooksapp.com](https://trucking.balancebooksapp.com)
