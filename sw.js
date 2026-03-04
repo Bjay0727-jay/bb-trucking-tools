@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bb-tools-v3';
+const CACHE_NAME = 'bb-tools-v4';
 const ASSETS = [
     '/',
     '/fuel-converter/',
@@ -8,7 +8,6 @@ const ASSETS = [
     '/deadhead-calculator/',
     '/per-diem/',
     '/styles/shared.css',
-    '/js/integration.js',
     '/icons/icon-192.png',
     '/icons/icon-512.png',
     '/manifest.json'

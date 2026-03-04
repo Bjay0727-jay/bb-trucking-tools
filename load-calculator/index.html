@@ -346,7 +346,6 @@
 
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
-                        <button class="btn btn-primary" onclick="saveToBalanceBooks()">💾 Save to BalanceBooks</button>
                     </div>
                 </div>
             </div>
@@ -373,7 +372,6 @@
         </div>
     </footer>
 
-    <script src="/js/integration.js"></script>
     <script>
         const GOOD_RPM_THRESHOLD = 1.50;
         const MARGINAL_RPM_THRESHOLD = 1.00;
@@ -495,48 +493,6 @@
             document.getElementById('costPerMile').value = 0.45;
             document.getElementById('dispatchFee').value = 0;
             calculate();
-        }
-
-        // ============ BALANCEBOOKS INTEGRATION ============
-        function saveToBalanceBooks() {
-            const lineHaul = parseFloat(document.getElementById('lineHaul').value) || 0;
-            const loadedMiles = parseFloat(document.getElementById('loadedMiles').value) || 0;
-            
-            if (lineHaul === 0 || loadedMiles === 0) {
-                alert('Please enter at least the line haul rate and loaded miles.');
-                return;
-            }
-
-            // Get all calculation results
-            const payload = {
-                source: 'load-calculator',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                load: {
-                    lineHaul: parseFloat(document.getElementById('lineHaul').value) || 0,
-                    fuelSurcharge: parseFloat(document.getElementById('fuelSurcharge').value) || 0,
-                    loadedMiles: parseFloat(document.getElementById('loadedMiles').value) || 0,
-                    deadheadMiles: parseFloat(document.getElementById('deadheadMiles').value) || 0,
-                    fuelPrice: parseFloat(document.getElementById('fuelPrice').value) || 3.50,
-                    mpg: parseFloat(document.getElementById('mpg').value) || 6.5,
-                    costPerMile: parseFloat(document.getElementById('costPerMile').value) || 0.45,
-                    dispatchFee: parseFloat(document.getElementById('dispatchFee').value) || 0,
-                    // Results from UI
-                    grossRevenue: parseFloat(document.getElementById('grossRevenue')?.textContent.replace(/[$,]/g, '')) || 0,
-                    netProfit: parseFloat(document.getElementById('netProfit')?.textContent.replace(/[$,]/g, '')) || 0,
-                    rpmGross: parseFloat(document.getElementById('rpmGross')?.textContent.replace(/[$,]/g, '')) || 0,
-                    rpmNet: parseFloat(document.getElementById('rpmNet')?.textContent.replace(/[$,]/g, '')) || 0,
-                    profitMargin: parseFloat(document.getElementById('profitMargin')?.textContent.replace('%', '')) || 0,
-                    verdict: document.getElementById('verdictText')?.textContent || 'Unknown'
-                }
-            };
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'loads');
-            } catch (e) {
-                console.error('Integration error:', e);
-                alert('Could not save load data. Please try again.');
-            }
         }
 
         // Initial calculation

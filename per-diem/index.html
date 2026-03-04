@@ -269,7 +269,7 @@
 
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
-                        <button class="btn btn-primary" onclick="sendToApp()">🚀 Send to BalanceBooks</button>
+
                     </div>
                 </div>
             </div>
@@ -296,7 +296,6 @@
         </div>
     </footer>
 
-    <script src="/js/integration.js"></script>
     <script>
         // Defaults — overridden by /data/rates.json at runtime
         let DAILY_RATE = 69;
@@ -351,48 +350,6 @@
             document.getElementById('taxBracket').value = '0.22';
             document.getElementById('stateRate').value = 5;
             calculate();
-        }
-
-        function sendToApp() {
-            const fullDays = parseFloat(document.getElementById('daysAway').value) || 0;
-            const partialDays = parseFloat(document.getElementById('partialDays').value) || 0;
-            const taxBracket = parseFloat(document.getElementById('taxBracket').value) || 0.22;
-            const stateRate = (parseFloat(document.getElementById('stateRate').value) || 0) / 100;
-
-            const fullDaysAmount = fullDays * DAILY_RATE;
-            const partialDaysAmount = partialDays * PARTIAL_RATE;
-            const totalDeduction = fullDaysAmount + partialDaysAmount;
-            const deductibleAmount = totalDeduction * DOT_DEDUCTION_RATE;
-
-            const payload = {
-                source: 'per-diem',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                perDiem: {
-                    dailyRate: DAILY_RATE,
-                    fullDays: fullDays,
-                    partialDays: partialDays,
-                    fullDaysAmount: fullDaysAmount,
-                    partialDaysAmount: partialDaysAmount,
-                    totalDeduction: totalDeduction,
-                    deductibleAmount: deductibleAmount,
-                    taxBracket: taxBracket,
-                    stateRate: stateRate,
-                    savings: {
-                        federal: deductibleAmount * taxBracket,
-                        state: deductibleAmount * stateRate,
-                        selfEmployment: deductibleAmount * SE_TAX_RATE,
-                        total: deductibleAmount * (taxBracket + stateRate + SE_TAX_RATE)
-                    }
-                }
-            };
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'expenses');
-            } catch (e) {
-                console.error('Integration error:', e);
-                alert('Could not prepare data. Please try again.');
-            }
         }
 
         // Initial calculation

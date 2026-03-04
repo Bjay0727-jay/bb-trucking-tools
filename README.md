@@ -90,8 +90,6 @@ TTL: Auto
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml         # GitHub Actions auto-deploy
-├── js/
-│   └── integration.js         # App integration utilities
 ├── icons/
 │   └── icon.svg               # App icon (convert to PNGs)
 ├── fuel-converter/
@@ -167,33 +165,6 @@ Target keywords:
 - "IFTA calculator trucking"
 - "cost per mile owner operator"
 - "trucker per diem calculator"
-
-## 🔗 Integration with BalanceBooks Trucking App
-
-Tools can send data directly to the main trucking app via localStorage:
-
-| Tool | Button | Data Sent |
-|------|--------|-----------|
-| Fuel Converter | 🚀 Import to App | Fuel transactions |
-| IFTA Calculator | 🚀 Send to BalanceBooks | Quarterly state data |
-| Load Calculator | 💾 Save to BalanceBooks | Load profitability analysis |
-| Cost Per Mile | 🔄 Sync to BalanceBooks | CPM settings |
-
-**How it works:**
-1. User clicks integration button
-2. Data stored in `localStorage` key: `bb_tools_export`
-3. Opens trucking app with `?import=tools` URL param
-4. App detects import, shows confirmation modal
-5. Data imported to appropriate section
-
-See `INTEGRATION-DEPLOYMENT.md` for React hooks and components to add to your trucking app.
-
-**Quick link buttons for the trucking app:**
-```jsx
-<button onClick={() => window.open('https://tools.balancebooksapp.com/fuel-converter', '_blank')}>
-  📤 Import from Fuel Card
-</button>
-```
 
 ## 📝 License
 

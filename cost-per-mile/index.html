@@ -379,7 +379,6 @@
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
                         <a href="/load-calculator" class="btn btn-secondary">💰 Load Calculator</a>
-                        <button class="btn btn-primary" onclick="syncToBalanceBooks()">🔄 Sync to BalanceBooks</button>
                     </div>
                 </div>
             </div>
@@ -406,7 +405,6 @@
         </div>
     </footer>
 
-    <script src="/js/integration.js"></script>
     <script>
         function calculate() {
             const miles = parseFloat(document.getElementById('monthlyMiles').value) || 10000;
@@ -459,57 +457,6 @@
                 input.value = defaults[i] || 0;
             });
             calculate();
-        }
-
-        // ============ BALANCEBOOKS INTEGRATION ============
-        function syncToBalanceBooks() {
-            const miles = parseFloat(document.getElementById('monthlyMiles').value) || 10000;
-            
-            // Collect all expense data
-            const fixedCosts = {};
-            const fixedLabels = ['truckPayment', 'insurance', 'permits', 'eld', 'parking'];
-            document.querySelectorAll('[data-category="fixed"]').forEach((input, i) => {
-                fixedCosts[fixedLabels[i]] = parseFloat(input.value) || 0;
-            });
-
-            const variableCosts = {};
-            const varLabels = ['fuel', 'maintenance', 'tires', 'def', 'misc'];
-            document.querySelectorAll('[data-category="variable"]').forEach((input, i) => {
-                variableCosts[varLabels[i]] = parseFloat(input.value) || 0;
-            });
-
-            const fixedTotal = Object.values(fixedCosts).reduce((s, v) => s + v, 0);
-            const variableTotal = Object.values(variableCosts).reduce((s, v) => s + v, 0);
-            const totalCPM = (fixedTotal + variableTotal) / miles;
-
-            const payload = {
-                source: 'cost-per-mile',
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                settings: {
-                    monthlyMiles: miles,
-                    fixedCosts: fixedCosts,
-                    variableCosts: variableCosts,
-                    calculated: {
-                        fixedTotal: fixedTotal,
-                        variableTotal: variableTotal,
-                        totalMonthly: fixedTotal + variableTotal,
-                        totalCPM: totalCPM,
-                        fixedCPM: fixedTotal / miles,
-                        variableCPM: variableTotal / miles,
-                        breakEvenRate: totalCPM,
-                        recommendedRate20: totalCPM / 0.80,
-                        recommendedRate30: totalCPM / 0.70
-                    }
-                }
-            };
-
-            try {
-                BB_INTEGRATION.sendToApp(payload, 'settings');
-            } catch (e) {
-                console.error('Integration error:', e);
-                alert('Could not sync settings. Please try again.');
-            }
         }
 
         // Initial calculation
